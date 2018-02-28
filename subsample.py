@@ -112,11 +112,12 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
     -----
     Created by Chun Ly, 28 February 2018
      - Call galaxy_field to get field names for each target
+     - Always require [field] (for galaxy_field() input)
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
 
-    if type(tab0) == type(None) and field == '':
+    if field == '':
         log.warn("### [field] input not specified!!!")
         log.warn("### Either 'udeep' or 'deep'")
         log.warn('### Exiting!!!')
