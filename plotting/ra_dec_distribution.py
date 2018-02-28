@@ -21,6 +21,7 @@ from astropy.table import Table
 from astropy import log
 
 from .. import read_catalog
+from .. import subsample
 
 def main(field='', dr='pdr1', silent=False, verbose=True):
 
@@ -47,6 +48,7 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
     Notes
     -----
     Created by Chun Ly, 28 February 2018
+     - Import subsample module to get NB excess emitter subsamples
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -58,6 +60,10 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
         return
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
+
+    sub_dict0 = subsample.main(tab0=tab0, field=field, dr=dr)
+
+    sample_keys = sub_dict0.keys()
 
     if silent == False: log.info('### End main : '+systime())
 #enddef
