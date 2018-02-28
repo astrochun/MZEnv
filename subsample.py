@@ -111,6 +111,7 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
     Notes
     -----
     Created by Chun Ly, 28 February 2018
+     - Call galaxy_field to get field names for each target
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -140,7 +141,10 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
         idx = np.array([xx for xx in range(n_gal) if subsam[xx] == subsam0[ss]])
         sub_dict0[subsam0[ss]] = idx
 
-    return sub_dict0
+    gal_field0 = galaxy_field(tab0, field)
+
     if silent == False: log.info('### End main : '+systime())
+
+    return sub_dict0, gal_field0
 #enddef
 
