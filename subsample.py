@@ -20,6 +20,68 @@ from collections import OrderedDict
 
 from . import read_catalog
 
+def galaxy_field(tab0, field, silent=False, verbose=True):
+    '''
+    Determine galaxy field (e.g., COSMOS, SXDS, etc.) based on RA
+
+    Parameters
+    ----------
+    tab0 : astropy.table.table.Table
+      Astropy Table of HSC-SSP NB excess emitter catalog.
+
+    field : str
+      Name of field to read in. Either 'udeep' or 'deep'
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+
+    Returns
+    -------
+    g_field0 : numpy.array
+      String array containing galaxy field name (e.g., 'UD-COSMOS')
+
+    Notes
+    -----
+    Created by Chun Ly, 28 February 2018
+    '''
+
+    ra  = tab0['ra'] / 15.0 # in hours
+    dec = tab0['dec']
+
+    g_field    = np.chararray(len(tab0), itemsize=10)
+    g_field[:] = 'N/A'
+
+    sxds = [xx for xx in range(len(tab0)) if
+            (ra[xx] >= 2.0 and ra[xx] <= 3.0)]
+    if len(sxds) > 0:
+        g_field[sxds] = 'SXDS'
+
+    cosmos = [xx for xx in range(len(tab0)) if
+              (ra[xx] >= 9.75 and ra[xx] <= 10.25)]
+    if len(cosmos) > 0:
+        g_field[cosmos] = 'COSMOS'
+
+    elais = [xx for xx in range(len(tab0)) if
+             (ra[xx] >= 15.75 and ra[xx] <= 16.5)]
+    if len(elais) > 0:
+        g_field[elais] = 'ELAIS_N1'
+
+    deep2 = [xx for xx in range(len(tab0)) if
+             (ra[xx] >= 23.25 and ra[xx] <= 23.75)]
+    if len(deep2) > 0:
+        g_field[deep2] = 'DEEP2_3'
+
+
+    if field == 'udeep': prefix = 'UD'
+    if field == 'deep': prefix = 'D'
+
+    g_field0 = np.array([prefix+'-'+a for a in g_field])
+    return g_field0
+#enddef
+
 def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
 
     '''
