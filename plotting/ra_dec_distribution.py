@@ -50,6 +50,7 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
     Created by Chun Ly, 28 February 2018
      - Import subsample module to get NB excess emitter subsamples
      - Call subsample to get galaxy field, [gal_field]
+     - Construct for loop to look over each galaxy field and subsample
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -65,6 +66,19 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
     sub_dict0, gal_field = subsample.main(tab0=tab0, field=field, dr=dr)
 
     sample_keys = sub_dict0.keys()
+
+    gal_field0 = list(set(gal_field)) # Get unique list
+
+    for t_field in gal_field0:
+        f_idx = [xx for xx in range(len(tab0)) if gal_field[xx] == t_field]
+
+        for key in sample_keys:
+            s_idx = sub_dict0[key]
+
+            # Get the intersection of f_idx and s_idx
+            t_idx = list(set(f_idx) & set(s_idx))
+            print t_field, key, len(t_idx)
+
 
     if silent == False: log.info('### End main : '+systime())
 #enddef
