@@ -260,3 +260,27 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
 
     if silent == False: log.info('### End main : '+systime())
 #enddef
+
+
+def run_18b():
+
+    '''
+    Call main() for specific plots to generate sets
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    None
+
+    Notes
+    -----
+    Created by Chun Ly, 1 March 2018
+    '''
+
+    for depth in ['udeep','deep']:
+        main(depth, dr='pdr1', DEIMOS=True)
+        main(depth, dr='pdr1', Hecto=True)
+#enddef
