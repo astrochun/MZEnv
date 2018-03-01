@@ -20,10 +20,54 @@ import matplotlib.pyplot as plt
 from astropy.table import Table
 from astropy import log
 
+import matplotlib.patches as mpatches # + on 01/03/2018
+
 from .. import read_catalog
 from .. import subsample
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
+
+def plot_deimos_fov(ax, coord, pa=0.0):
+    '''
+    Overlay Keck/DEIMOS FoV on image
+
+    Parameters
+    ----------
+    ax : matplotlib.axes._subplots.AxesSubplot
+      Matplotlib axes from plt.subplots()
+
+    coord : list
+      Central RA,Dec coordinate provided in degrees
+
+    pa : float
+      PA in degrees of DEIMOS orientation. Positive is E of North.
+      Default: 0.0 deg
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+    '''
+
+    rad = PA*np.pi/180.0
+
+    dx0 =  5.0 / 60.0 # in deg
+    dy0 = 16.7 / 60.0 # in deg
+
+    xbox0 = np.array([ 1, 1,-1,-1])*dx0/2.0
+    ybox0 = np.array([-1, 1, 1,-1])*dy0/2.0
+
+    xprime =  xbox0*np.cos(rad) + ybox0*np.sin(rad)
+    yprime = -xbox0*np.sin(rad) + ybox0*np.cos(rad)
+    xbox = coord[0] + xprime
+    ybox = coord[1] + yprime
+
+    xy_log = [xbox[3], ybox[3]]
+    rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=PA, alpha=0.33, ec="r",
+                              color="r")
+    ax.add_patch(rect)
+#enddef
 
 def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
 
