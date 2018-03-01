@@ -5,11 +5,11 @@ ra_dec_distribution
 Plot spatial distribution of HSC-SSP NB excess emitter samples
 """
 
-import sys, os
-
 from chun_codes import systime
 
+from getpass import getuser
 from os.path import exists
+
 from astropy.io import ascii as asc
 from astropy.io import fits
 
@@ -51,6 +51,7 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
      - Import subsample module to get NB excess emitter subsamples
      - Call subsample to get galaxy field, [gal_field]
      - Construct for loop to look over each galaxy field and subsample
+     - Define output PDF path
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -60,6 +61,9 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
         log.warn("### Either 'udeep' or 'deep'")
         log.warn('### Exiting!!!')
         return
+
+    if getuser() == 'cly':
+        dir0 = '/Users/cly/Google Drive/MZEnv/'
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
 
