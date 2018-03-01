@@ -23,6 +23,8 @@ from astropy import log
 from .. import read_catalog
 from .. import subsample
 
+#bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
+
 def main(field='', dr='pdr1', silent=False, verbose=True):
 
     '''
@@ -52,6 +54,8 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
      - Call subsample to get galaxy field, [gal_field]
      - Construct for loop to look over each galaxy field and subsample
      - Define output PDF path
+     - Plot ra and dec for each galaxy field and NB subsamples
+
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -66,6 +70,7 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
         dir0 = '/Users/cly/Google Drive/MZEnv/'
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
+    ra0, dec0 = tab0['ra'], tab0['dec']
 
     sub_dict0, gal_field = subsample.main(tab0=tab0, field=field, dr=dr)
 
@@ -76,6 +81,8 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
     for t_field in gal_field0:
         f_idx = [xx for xx in range(len(tab0)) if gal_field[xx] == t_field]
 
+        fig, ax = plt.subplots()
+
         for key in sample_keys:
             s_idx = sub_dict0[key]
 
@@ -83,6 +90,31 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
             t_idx = list(set(f_idx) & set(s_idx))
             print t_field, key, len(t_idx)
 
+            if len(t_idx) > 0:
+                m0 = 'o' if 'NB0921' in key else '+' if 'NB0816' in key else ''
+                c0 = 'red' if 'Ha' in key else 'green' if 'OIII' in key \
+                     else 'blue'
+                t_name = key.replace('NB0','NB')
+                t_name = t_name.replace('OIII_','[OIII] ')
+                t_name = t_name.replace('OII_','[OII] ')
+                t_name = t_name.replace('Ha_',r'H$\alpha$ ')
+                t_name += ' ('+str(len(t_idx))+')'
+                ax.scatter(ra0[t_idx], dec0[t_idx], s=5, marker=m0, color=c0,
+                           linewidth=0.5, edgecolor='none', alpha=0.5,
+                           label=t_name)
+            #endif
+        #endfor
+
+        ax.set_xlabel('Right Ascension (deg)')
+        ax.set_ylabel('Declination (deg)')
+
+        ax.annotate(t_field, [0.05,0.95], xycoords='axes fraction',
+                    fontsize=12, ha='left', va='top')
+        ax.minorticks_on()
+        ax.legend(loc='lower right', frameon=False, fontsize=10, framealpha=0.9)
+
+        out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
+        fig.savefig(out_pdf, bbox_inches='tight')
 
     if silent == False: log.info('### End main : '+systime())
 #enddef
