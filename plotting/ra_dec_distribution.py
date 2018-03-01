@@ -25,7 +25,7 @@ from .. import subsample
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
 
-def main(field='', dr='pdr1', silent=False, verbose=True):
+def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
 
     '''
     Main function to plot RA and Dec for each sub-sample of NB excess emitters
@@ -37,6 +37,9 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
 
     dr : str
       Data release name. Default: 'pdr1'
+
+    noOII : boolean
+      Indicate whether to NOT plot [OII] emitters. Default: False
 
     silent : boolean
       Turns off stdout messages. Default: False
@@ -55,7 +58,9 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
      - Construct for loop to look over each galaxy field and subsample
      - Define output PDF path
      - Plot ra and dec for each galaxy field and NB subsamples
-
+    Modified by Chun Ly, 1 March 2018
+     - Add noOII keyword to prevent [OII] emitters from being plotted
+     - log.info output PDF file
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -99,9 +104,14 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
                 t_name = t_name.replace('OII_','[OII] ')
                 t_name = t_name.replace('Ha_',r'H$\alpha$ ')
                 t_name += ' ('+str(len(t_idx))+')'
-                ax.scatter(ra0[t_idx], dec0[t_idx], s=5, marker=m0, color=c0,
-                           linewidth=0.5, edgecolor='none', alpha=0.5,
-                           label=t_name)
+
+                # Mod on 01/03/2018
+                if (noOII and 'OII_' in key):
+                    if silent == False: log.warn('## Will not plot '+key)
+                else:
+                    ax.scatter(ra0[t_idx], dec0[t_idx], s=5, marker=m0,
+                               color=c0, linewidth=0.5, edgecolor='none',
+                               alpha=0.5, label=t_name)
             #endif
         #endfor
 
@@ -113,7 +123,10 @@ def main(field='', dr='pdr1', silent=False, verbose=True):
         ax.minorticks_on()
         ax.legend(loc='lower right', frameon=False, fontsize=10, framealpha=0.9)
 
+        # Mod on 01/03/2018
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
+        if noOII: out_pdf = out_pdf.replace('.pdf','.noOII.pdf')
+        if silent == False: log.info('## Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
     if silent == False: log.info('### End main : '+systime())
