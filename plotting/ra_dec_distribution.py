@@ -79,7 +79,8 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     return ax
 #enddef
 
-def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
+def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
+         verbose=True):
 
     '''
     Main function to plot RA and Dec for each sub-sample of NB excess emitters
@@ -94,6 +95,9 @@ def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
 
     noOII : boolean
       Indicate whether to NOT plot [OII] emitters. Default: False
+
+    DEIMOS : boolean
+      Indicate whether to plot Keck/DEIMOS FoV on PDF plots
 
     silent : boolean
       Turns off stdout messages. Default: False
@@ -115,6 +119,7 @@ def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
     Modified by Chun Ly, 1 March 2018
      - Add noOII keyword to prevent [OII] emitters from being plotted
      - log.info output PDF file
+     - Add DEIMOS boolean keyword input and plot DEIMOS FoV when set
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -177,9 +182,15 @@ def main(field='', dr='pdr1', noOII=False, silent=False, verbose=True):
         ax.minorticks_on()
         ax.legend(loc='lower right', frameon=False, fontsize=10, framealpha=0.9)
 
+        # Overlay DEIMOS FoV | + on 01/03/2018
+        if DEIMOS:
+            a_coord = [np.average(ra0[f_idx]), np.average(dec0[f_idx])]
+            ax = plot_deimos_fov(ax, a_coord, pa=0.0)
+
         # Mod on 01/03/2018
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
         if noOII: out_pdf = out_pdf.replace('.pdf','.noOII.pdf')
+        if DEIMOS: out_pdf = out_pdf.replace('.pdf', '.DEIMOS.pdf')
         if silent == False: log.info('## Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
