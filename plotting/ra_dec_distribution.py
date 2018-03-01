@@ -109,8 +109,8 @@ def plot_hecto_fov(ax, coord):
     return ax
 #enddef
 
-def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
-         verbose=True):
+def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
+         silent=False, verbose=True):
 
     '''
     Main function to plot RA and Dec for each sub-sample of NB excess emitters
@@ -128,6 +128,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
 
     DEIMOS : boolean
       Indicate whether to plot Keck/DEIMOS FoV on PDF plots
+
+    Hecto : boolean
+      Indicate whether to plot MMT/Hecto FoV on PDF plots
 
     silent : boolean
       Turns off stdout messages. Default: False
@@ -153,6 +156,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
      - Set axes limit for RA and Dec for each galaxy field
      - ax.legend() visibility improvement, RA/Dec limit changes
      - Bug fix: Placement of n_subsample for ax.legend() ncol determination
+     - Add Hecto boolean keyword input and plot Hecto FoV when set
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -241,10 +245,16 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
             a_coord = [np.average(ra0[f_idx]), np.average(dec0[f_idx])]
             ax = plot_deimos_fov(ax, a_coord, pa=0.0)
 
+        # Overlay Hecto FoV | + on 01/03/2018
+        if Hecto:
+            a_coord = [np.average(ra0[f_idx]), np.average(dec0[f_idx])]
+            ax = plot_hecto_fov(ax, a_coord)
+
         # Mod on 01/03/2018
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
         if noOII: out_pdf = out_pdf.replace('.pdf','.noOII.pdf')
         if DEIMOS: out_pdf = out_pdf.replace('.pdf', '.DEIMOS.pdf')
+        if Hecto: out_pdf = out_pdf.replace('.pdf', '.Hecto.pdf')
         if silent == False: log.info('## Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
