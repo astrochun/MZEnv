@@ -79,6 +79,37 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     return ax
 #enddef
 
+def plot_hecto_fov(ax, coord):
+    '''
+    Overlay MMT/Hecto FoV on image
+
+    Parameters
+    ----------
+    ax : matplotlib.axes._subplots.AxesSubplot
+      Matplotlib axes from plt.subplots()
+
+    coord : list
+      Central RA,Dec coordinate provided in degrees
+
+    Returns
+    -------
+     ax with Circle patch added
+
+    Notes
+    -----
+    Created by Chun Ly, 1 March 2018
+    '''
+
+    rad = pa*np.pi/180.0
+
+    radius = 0.5 # in deg
+
+    circ = mpatches.Circle(coord, radius=radius, alpha=0.33, ec="b",
+                           color="b")
+    ax.add_patch(circ)
+    return ax
+#enddef
+
 def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
          verbose=True):
 
