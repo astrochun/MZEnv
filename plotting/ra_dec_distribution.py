@@ -121,6 +121,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
      - log.info output PDF file
      - Add DEIMOS boolean keyword input and plot DEIMOS FoV when set
      - Set axes limit for RA and Dec for each galaxy field
+     - ax.legend() visibility improvement, RA/Dec limit changes
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -146,19 +147,21 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
     RA_lim_dict0 = {'UD-COSMOS':  [149.25,151.00],
                     'UD-SXDS':    [ 33.70, 35.45],
                     'D-COSMOS':   [148.75,151.80],
-                    'D-DEEP2_3':  [350.15,354.00],
-                    'D-ELAIS_N1': [240.00,245.50]}
+                    'D-DEEP2_3':  [350.20,353.95],
+                    'D-ELAIS_N1': [240.10,245.40]}
 
-    DE_lim_dict0 = {'UD-COSMOS':  [ 1.25, 3.00],
-                    'UD-SXDS':    [-5.80,-4.05],
+    DE_lim_dict0 = {'UD-COSMOS':  [ 1.30, 3.00],
+                    'UD-SXDS':    [-5.80,-4.10],
                     'D-COSMOS':   [ 2.00, 3.75],
-                    'D-DEEP2_3':  [-1.80, 1.10],
+                    'D-DEEP2_3':  [-1.90, 1.10],
                     'D-ELAIS_N1': [52.90,56.85]}
 
     for t_field in gal_field0:
         f_idx = [xx for xx in range(len(tab0)) if gal_field[xx] == t_field]
 
         fig, ax = plt.subplots()
+
+        n_subsample = 0
 
         for key in sample_keys:
             s_idx = sub_dict0[key]
@@ -168,6 +171,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
             print t_field, key, len(t_idx)
 
             if len(t_idx) > 0:
+                n_subsample += 1
+
                 m0 = 'o' if 'NB0921' in key else '+' if 'NB0816' in key else ''
                 c0 = 'red' if 'Ha' in key else 'green' if 'OIII' in key \
                      else 'blue'
@@ -192,10 +197,14 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
 
         ax.set_xlim([RA_lim_dict0[t_field][1], RA_lim_dict0[t_field][0]])
         ax.set_ylim(DE_lim_dict0[t_field])
-        ax.annotate(t_field, [0.05,0.95], xycoords='axes fraction',
-                    fontsize=12, ha='left', va='top')
+        ax.annotate(t_field, [0.025,0.975], xycoords='axes fraction',
+                    fontsize=12, fontweight='bold', ha='left', va='top')
         ax.minorticks_on()
-        ax.legend(loc='lower right', frameon=False, fontsize=10, framealpha=0.9)
+
+        # Mod on 01/03/2018
+        ncol = 3 if n_subsample % 3 == 0 else 2
+        ax.legend(loc='lower center', ncol=ncol, frameon=False, fontsize=10,
+                  framealpha=0.9)
 
         # Overlay DEIMOS FoV | + on 01/03/2018
         if DEIMOS:
