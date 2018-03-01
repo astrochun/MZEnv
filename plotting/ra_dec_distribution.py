@@ -99,12 +99,13 @@ def plot_hecto_fov(ax, coord):
     -----
     Created by Chun Ly, 1 March 2018
      - Bug fix for no PA input
+     - Aesthetic changes (unfilled circle)
     '''
 
     radius = 0.5 # in deg
 
-    circ = mpatches.Circle(coord, radius=radius, alpha=0.33, ec="b",
-                           color="b")
+    circ = mpatches.Circle(coord, radius=radius, alpha=0.5, ec="b",
+                           color="none", linewidth=1.5)
     ax.add_patch(circ)
     return ax
 #enddef
