@@ -98,9 +98,8 @@ def plot_hecto_fov(ax, coord):
     Notes
     -----
     Created by Chun Ly, 1 March 2018
+     - Bug fix for no PA input
     '''
-
-    rad = pa*np.pi/180.0
 
     radius = 0.5 # in deg
 
