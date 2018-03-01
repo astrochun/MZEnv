@@ -122,6 +122,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
      - Add DEIMOS boolean keyword input and plot DEIMOS FoV when set
      - Set axes limit for RA and Dec for each galaxy field
      - ax.legend() visibility improvement, RA/Dec limit changes
+     - Bug fix: Placement of n_subsample for ax.legend() ncol determination
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -171,8 +172,6 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
             print t_field, key, len(t_idx)
 
             if len(t_idx) > 0:
-                n_subsample += 1
-
                 m0 = 'o' if 'NB0921' in key else '+' if 'NB0816' in key else ''
                 c0 = 'red' if 'Ha' in key else 'green' if 'OIII' in key \
                      else 'blue'
@@ -186,6 +185,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, silent=False,
                 if (noOII and 'OII_' in key):
                     if silent == False: log.warn('## Will not plot '+key)
                 else:
+                    n_subsample += 1
                     ax.scatter(ra0[t_idx], dec0[t_idx], s=5, marker=m0,
                                color=c0, linewidth=0.5, edgecolor='none',
                                alpha=0.5, label=t_name)
