@@ -201,6 +201,7 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
      - Always require [field] (for galaxy_field() input)
     Modified by Chun Ly, 1 March 2018
      - Update documentation
+     - Update call to galaxy_field() and return
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -230,10 +231,10 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
         idx = np.array([xx for xx in range(n_gal) if subsam[xx] == subsam0[ss]])
         sub_dict0[subsam0[ss]] = idx
 
-    gal_field0 = galaxy_field(tab0, field)
+    gal_dict0 = galaxy_field(tab0, field)
 
     if silent == False: log.info('### End main : '+systime())
 
-    return sub_dict0, gal_field0
+    return sub_dict0, gal_dict0
 #enddef
 
