@@ -49,6 +49,7 @@ def galaxy_field(tab0, field, silent=False, verbose=True):
 
     Modified by Chun Ly, 1 March 2018
      - Define galaxy dictionary and return instead
+     - Bug fix: typo
     '''
 
     ra  = tab0['ra'] / 15.0 # in hours
@@ -87,14 +88,13 @@ def galaxy_field(tab0, field, silent=False, verbose=True):
 
     g_dict0 = OrderedDict()
     for gal in g_field0:
-        idx = np.array([xx for xx in range(n_gal) if g_field[xx] == gal])
+        idx = np.array([xx for xx in range(len(tab0)) if g_field[xx] == gal])
         g_dict0[gal] = idx
 
     return g_dict0 #, g_field0
 #enddef
 
-def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
-                  verbose=True):
+def summary_table(sub_dict0, gal_dict0, silent=False, verbose=True):
     '''
     Generate Astropy table of number of subsamples for each galaxy field
 
@@ -104,8 +104,9 @@ def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
       Dictionary containing indices for each NB excess emitter subsample.
       From main()
 
-    gal_field : list
-      List of string containing the field name [from galaxy_field()]
+    gal_dict0 : dict
+      Dictionary containing indices for each galaxy field name
+      [from galaxy_field()]
 
     silent : boolean
       Turns off stdout messages. Default: False
@@ -121,12 +122,11 @@ def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
     Notes
     -----
     Created by Chun Ly, 1 March 2018
+     - Change from gal_field to gal_dict0 input
     '''
 
-    if type(gal_field0) == type(None):
-        gal_field0 = list(set(gal_field))
-
-    n_fields = len(gal_field0)
+    gal_field0 = gal_dict0.keys()
+    n_fields   = len(gal_field0)
 
     fieldname   = np.array(gal_field0)
     n_HaNB816   = np.zeros(n_fields, dtype=np.int16)
@@ -138,8 +138,7 @@ def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
     n_OIINB921  = np.zeros(n_fields, dtype=np.int16)
 
     for ff in range(n_fields):
-        f_idx = [xx for xx in range(len(gal_field)) if
-                 gal_field[xx] == gal_field0[ff]]
+        f_idx = gal_dict0[gal_field0[ff]]
 
         for key in sub_dict0.keys():
             s_idx = sub_dict0[key]
