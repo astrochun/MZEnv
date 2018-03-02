@@ -154,7 +154,7 @@ def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
 def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
 
     '''
-    Provide explanation for function here.
+    Main function for HSC NB excess emitter subsample definition
 
     Parameters
     ----------
@@ -176,12 +176,20 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
 
     Returns
     -------
+    sub_dict0 : dict
+      Dictionary containing indices for each NB excess emitter subsample.
+      From main()
+
+    gal_field : list
+      List of string containing the field name [from galaxy_field()]
 
     Notes
     -----
     Created by Chun Ly, 28 February 2018
      - Call galaxy_field to get field names for each target
      - Always require [field] (for galaxy_field() input)
+    Modified by Chun Ly, 1 March 2018
+     - Update documentation
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
