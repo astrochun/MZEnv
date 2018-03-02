@@ -158,6 +158,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - ax.legend() visibility improvement, RA/Dec limit changes
      - Bug fix: Placement of n_subsample for ax.legend() ncol determination
      - Add Hecto boolean keyword input and plot Hecto FoV when set
+     - Update call to subsample.main(); simplify code
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -174,11 +175,10 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
     ra0, dec0 = tab0['ra'], tab0['dec']
 
-    sub_dict0, gal_field = subsample.main(tab0=tab0, field=field, dr=dr)
+    # Mod on 01/03/2018
+    sub_dict0, gal_dict0 = subsample.main(tab0=tab0, field=field, dr=dr)
 
-    sample_keys = sub_dict0.keys()
-
-    gal_field0 = list(set(gal_field)) # Get unique list
+    gal_field0 = gal_dict0.keys() # Unique galaxy field list
 
     RA_lim_dict0 = {'UD-COSMOS':  [149.25,151.00],
                     'UD-SXDS':    [ 33.70, 35.45],
@@ -193,13 +193,13 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                     'D-ELAIS_N1': [52.90,56.85]}
 
     for t_field in gal_field0:
-        f_idx = [xx for xx in range(len(tab0)) if gal_field[xx] == t_field]
+        f_idx = gal_dict0[t_field] # Mod on 01/03/2018
 
         fig, ax = plt.subplots()
 
         n_subsample = 0
 
-        for key in sample_keys:
+        for key in sub_dict0.keys(): # Mod on 01/03/2018
             s_idx = sub_dict0[key]
 
             # Get the intersection of f_idx and s_idx
