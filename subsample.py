@@ -46,40 +46,51 @@ def galaxy_field(tab0, field, silent=False, verbose=True):
     Notes
     -----
     Created by Chun Ly, 28 February 2018
+
+    Modified by Chun Ly, 1 March 2018
+     - Define galaxy dictionary and return instead
     '''
 
     ra  = tab0['ra'] / 15.0 # in hours
     dec = tab0['dec']
 
-    g_field    = np.chararray(len(tab0), itemsize=10)
-    g_field[:] = 'N/A'
+    t_field    = np.chararray(len(tab0), itemsize=10)
+    t_field[:] = 'N/A'
 
     sxds = [xx for xx in range(len(tab0)) if
             (ra[xx] >= 2.0 and ra[xx] <= 3.0)]
     if len(sxds) > 0:
-        g_field[sxds] = 'SXDS'
+        t_field[sxds] = 'SXDS'
 
     cosmos = [xx for xx in range(len(tab0)) if
               (ra[xx] >= 9.75 and ra[xx] <= 10.25)]
     if len(cosmos) > 0:
-        g_field[cosmos] = 'COSMOS'
+        t_field[cosmos] = 'COSMOS'
 
     elais = [xx for xx in range(len(tab0)) if
              (ra[xx] >= 15.75 and ra[xx] <= 16.5)]
     if len(elais) > 0:
-        g_field[elais] = 'ELAIS_N1'
+        t_field[elais] = 'ELAIS_N1'
 
     deep2 = [xx for xx in range(len(tab0)) if
              (ra[xx] >= 23.25 and ra[xx] <= 23.75)]
     if len(deep2) > 0:
-        g_field[deep2] = 'DEEP2_3'
+        t_field[deep2] = 'DEEP2_3'
 
 
     if field == 'udeep': prefix = 'UD'
     if field == 'deep': prefix = 'D'
 
-    g_field0 = np.array([prefix+'-'+a for a in g_field])
-    return g_field0
+    g_field = np.array([prefix+'-'+a for a in t_field])
+
+    g_field0 = list(set(g_field))
+
+    g_dict0 = OrderedDict()
+    for gal in g_field0:
+        idx = np.array([xx for xx in range(n_gal) if g_field[xx] == gal])
+        g_dict0[gal] = idx
+
+    return g_dict0 #, g_field0
 #enddef
 
 def summary_table(sub_dict0, gal_field, gal_field0=None, silent=False,
