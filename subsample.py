@@ -206,6 +206,7 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
     Modified by Chun Ly, 2 March 2018
      - Call summary_table()
      - Call paths module to get path
+     - Write ASCII-formatted subsample summary table
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -241,6 +242,8 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
 
     s_tab0 = summary_table(sub_dict0, gal_dict0, silent=silent, verbose=verbose)
     out_summary_tab_file = dir0 + 'catalogs/'+field+'_sample.tbl'
+    if silent == False: log.info('### Writing : '+out_summary_tab_file)
+    s_tab0.write(out_summary_tab_file, format='ascii.fixed_width_two_line')
 
     if silent == False: log.info('### End main : '+systime())
 
