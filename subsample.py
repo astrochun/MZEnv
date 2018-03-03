@@ -20,6 +20,7 @@ from collections import OrderedDict
 from getpass import getuser
 
 from . import read_catalog
+from . import paths
 
 def galaxy_field(tab0, field, silent=False, verbose=True):
     '''
@@ -204,6 +205,7 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
      - Update call to galaxy_field() and return
     Modified by Chun Ly, 2 March 2018
      - Call summary_table()
+     - Call paths module to get path
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -235,8 +237,7 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
 
     gal_dict0 = galaxy_field(tab0, field)
 
-    if getuser() == 'cly':
-        dir0 = '/Users/cly/Google Drive/MZEnv/'
+    dir0 = paths.gdrive() # Mod on 02/03/2018
 
     s_tab0 = summary_table(sub_dict0, gal_dict0, silent=silent, verbose=verbose)
     out_summary_tab_file = dir0 + 'catalogs/'+field+'_sample.tbl'
