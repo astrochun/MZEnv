@@ -58,9 +58,9 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     -----
     Created by Chun Ly, 1 March 2018
      - Bug fix: typos, return ax
+    Modified by Chun Ly, 3 March 2018
+     - Loop over each position to overlay Rectangle patch
     '''
-
-    rad = pa*np.pi/180.0
 
     dx0 =  5.0 / 60.0 # in deg
     dy0 = 16.7 / 60.0 # in deg
@@ -68,15 +68,24 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     xbox0 = np.array([ 1, 1,-1,-1])*dx0/2.0
     ybox0 = np.array([-1, 1, 1,-1])*dy0/2.0
 
-    xprime =  xbox0*np.cos(rad) + ybox0*np.sin(rad)
-    yprime = -xbox0*np.sin(rad) + ybox0*np.cos(rad)
-    xbox = coord[0] + xprime
-    ybox = coord[1] + yprime
+    n_ptgs = len(coord) # + on 03/03/2018
 
-    xy_low = [xbox[3], ybox[3]]
-    rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=pa, alpha=0.33, ec="r",
-                              color="r")
-    ax.add_patch(rect)
+    # Mod on 03/03/2018
+    for cc in range(n_ptgs):
+        rad = pa[cc]*np.pi/180.0
+
+        xprime =  xbox0*np.cos(rad) + ybox0*np.sin(rad)
+        yprime = -xbox0*np.sin(rad) + ybox0*np.cos(rad)
+
+        xbox = coord[cc][0] + xprime
+        ybox = coord[cc][1] + yprime
+
+        xy_low = [xbox[3], ybox[3]]
+        rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=pa[cc], alpha=0.33,
+                                  ec="r", color="r")
+        ax.add_patch(rect)
+    #endfor
+
     return ax
 #enddef
 
