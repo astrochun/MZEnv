@@ -162,6 +162,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Update call to subsample.main(); simplify code
     Modified by Chun Ly, 2 March 2018
      - Call paths module to get path
+    Modified by Chun Ly, 3 March 2018
+     - Read in field coordinate file for specific FoV overlay
+     - Generate DEIMOS coordinate list, pass to plot_deimos_fov()
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -173,6 +176,12 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         return
 
     dir0 = paths.gdrive() # Mod on 02/03/2018
+
+    # + on 03/03/2018
+    if DEIMOS or Hecto:
+        field_coord_file = dir0 + 'field_coordinates.txt'
+        if silent == False: log.info('### Writing : '+field_coord_file)
+        ptg_tab = asc.read(field_coord_file)
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
     ra0, dec0 = tab0['ra'], tab0['dec']
@@ -243,10 +252,16 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         ax.legend(loc='lower center', ncol=ncol, frameon=False, fontsize=10,
                   framealpha=0.9)
 
-        # Overlay DEIMOS FoV | + on 01/03/2018
+        # Overlay DEIMOS FoV | + on 01/03/2018, Mod on 03/03/2018
         if DEIMOS:
-            a_coord = [np.average(ra0[f_idx]), np.average(dec0[f_idx])]
-            ax = plot_deimos_fov(ax, a_coord, pa=0.0)
+            d_idx = [xx for xx in range(len(ptg_tab)) if
+                     ptg_tab['Instr'][xx] == 'DEIMOS']
+            pa, a_coord = [], []
+            for cc in range(len(d_idx)):
+                t_tab = ptg_tab[d_idx[cc]]
+                a_coord.append([t_tab['RA'], t_tab['Dec']])
+                pa.append(t_tab['PA'])
+                ax = plot_deimos_fov(ax, a_coord, pa=pa)
 
         # Overlay Hecto FoV | + on 01/03/2018
         if Hecto:
