@@ -60,6 +60,7 @@ def plot_deimos_fov(ax, coord, pa=0.0):
      - Bug fix: typos, return ax
     Modified by Chun Ly, 3 March 2018
      - Loop over each position to overlay Rectangle patch
+     - Sign handling and matrix rotation fix so positive PA is indeed E of N
     '''
 
     dx0 =  5.0 / 60.0 # in deg
@@ -72,17 +73,18 @@ def plot_deimos_fov(ax, coord, pa=0.0):
 
     # Mod on 03/03/2018
     for cc in range(n_ptgs):
-        rad = pa[cc]*np.pi/180.0
+        rad = -1*pa[cc]*np.pi/180.0 #Sign flip
 
-        xprime =  xbox0*np.cos(rad) + ybox0*np.sin(rad)
-        yprime = -xbox0*np.sin(rad) + ybox0*np.cos(rad)
+        xprime =  xbox0*np.cos(rad) - ybox0*np.sin(rad) #Sign fix
+        yprime =  xbox0*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
 
         xbox = coord[cc][0] + xprime
         ybox = coord[cc][1] + yprime
 
         xy_low = [xbox[3], ybox[3]]
-        rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=pa[cc], alpha=0.33,
-                                  ec="r", color="r")
+        ax.scatter([coord[cc][0]], [coord[cc][1]])
+        rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=-1*pa[cc], alpha=0.33,
+                                  ec="r", color="r") # Sign flip
         ax.add_patch(rect)
     #endfor
 
