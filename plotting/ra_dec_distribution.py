@@ -174,6 +174,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     Modified by Chun Ly, 3 March 2018
      - Read in field coordinate file for specific FoV overlay
      - Generate DEIMOS coordinate list, pass to plot_deimos_fov()
+     - Bug fix: Call plot_deimos_fov() outside of for loop
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -270,7 +271,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                 t_tab = ptg_tab[d_idx[cc]]
                 a_coord.append([t_tab['RA'], t_tab['Dec']])
                 pa.append(t_tab['PA'])
-                ax = plot_deimos_fov(ax, a_coord, pa=pa)
+
+            ax = plot_deimos_fov(ax, a_coord, pa=pa)
 
         # Overlay Hecto FoV | + on 01/03/2018
         if Hecto:
