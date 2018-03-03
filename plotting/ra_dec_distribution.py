@@ -24,6 +24,7 @@ import matplotlib.patches as mpatches # + on 01/03/2018
 
 from .. import read_catalog
 from .. import subsample
+from .. import paths
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
 
@@ -159,6 +160,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Bug fix: Placement of n_subsample for ax.legend() ncol determination
      - Add Hecto boolean keyword input and plot Hecto FoV when set
      - Update call to subsample.main(); simplify code
+    Modified by Chun Ly, 2 March 2018
+     - Call paths module to get path
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -169,8 +172,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         log.warn('### Exiting!!!')
         return
 
-    if getuser() == 'cly':
-        dir0 = '/Users/cly/Google Drive/MZEnv/'
+    dir0 = paths.gdrive() # Mod on 02/03/2018
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
     ra0, dec0 = tab0['ra'], tab0['dec']
