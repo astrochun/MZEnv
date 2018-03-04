@@ -248,6 +248,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - List comprehension: require DEIMOS pointing inside field
      - If statement before calling plot_deimos_fov()
      - Get vertices from plot_deimos_fov()
+    Modified by Chun Ly, 4 March 2018
+     - Call in_deimos_field()
+     - Create table of targets in DEIMOS field, deimos_tab0
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -348,6 +351,32 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                     pa.append(t_tab['PA'])
 
                 ax, deimos_verts0 = plot_deimos_fov(ax, a_coord, pa=pa)
+
+                # + on 04/03/2018
+                deimos_fld_idx = in_deimos_field(tab0, deimos_verts0,
+                                                 silent=silent, verbose=verbose)
+
+                # Get subsample sizes in each DEIMOS pointing | + on 04/03/2018
+                for key in sub_dict0.keys():
+                    s_idx = sub_dict0[key]
+
+                    cmd1 = 'n_fld_%s = np.zeros(len(d_idx), dtype=np.int)' % key
+                    exec(cmd1)
+                    for ff,in_field in zip(range(len(d_idx)),deimos_fld_idx):
+                        in_idx = list(set(in_field.tolist()) & set(s_idx))
+                        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
+                        exec(cmd2)
+                    #endfor
+                #endfor
+                t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
+                cmd3 = "fld_arr0 = [ptg_tab['MaskName'][d_idx], "+', '.join(t_cols)+']'
+                exec(cmd3)
+                names0 = ['MaskName'] + \
+                         [val.replace('NB0','NB') for val in sub_dict0.keys()]
+                deimos_tab0 = Table(fld_arr0, names=names0)
+                deimos_tab0.pprint(max_lines=-1)
+            #endif
+        #endif
 
         # Overlay Hecto FoV | + on 01/03/2018
         if Hecto:
