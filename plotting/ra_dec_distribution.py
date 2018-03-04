@@ -37,11 +37,13 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     ax : matplotlib.axes._subplots.AxesSubplot
       Matplotlib axes from plt.subplots()
 
-    coord : list
-      Central RA,Dec coordinate provided in degrees
+    coord : list of list
+      Central RA,Dec coordinate provided in degrees. Each position is provided
+      as a list within the main list.
+      coord = [ [RA1,Dec1], [RA2,Dec2], ...]
 
-    pa : float
-      PA in degrees of DEIMOS orientation. Positive is E of North.
+    pa : list
+      List of PA in degrees for DEIMOS orientation. Positive is E of North.
       Default: 0.0 deg
 
     silent : boolean
@@ -61,6 +63,7 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     Modified by Chun Ly, 3 March 2018
      - Loop over each position to overlay Rectangle patch
      - Sign handling and matrix rotation fix so positive PA is indeed E of N
+     - Update documentation
     '''
 
     dx0 =  5.0 / 60.0 # in deg
