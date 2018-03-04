@@ -192,6 +192,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Bug fix: Call plot_deimos_fov() outside of for loop
      - List comprehension: require DEIMOS pointing inside field
      - If statement before calling plot_deimos_fov()
+     - Get vertices from plot_deimos_fov()
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -291,7 +292,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                     a_coord.append([t_tab['RA'], t_tab['Dec']])
                     pa.append(t_tab['PA'])
 
-                ax = plot_deimos_fov(ax, a_coord, pa=pa)
+                ax, deimos_verts0 = plot_deimos_fov(ax, a_coord, pa=pa)
 
         # Overlay Hecto FoV | + on 01/03/2018
         if Hecto:
