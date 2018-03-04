@@ -55,6 +55,9 @@ def in_deimos_field(tab0, verts0, silent=False, verbose=True):
     Notes
     -----
     Created by Chun Ly, 3 March 2018
+
+    Modified by Chun Ly, 4 March 2018
+     - Bug fix: Incorrect variable name, patches -> verts0
     '''
 
     if silent == False: log.info('### Begin in_deimos_field : '+systime())
@@ -63,12 +66,11 @@ def in_deimos_field(tab0, verts0, silent=False, verbose=True):
     dec = tab0['dec'].data
     coords = np.array([ra, dec]).transpose()
 
-    n_ptgs = len(patches)
+    n_ptgs = len(verts0)
 
     in_field0 = []
     for cc in range(n_ptgs):
-        print patches[cc]
-        t_path = Path0(patches[cc])
+        t_path = Path0(verts0[cc])
 
         cp_res = t_path.contains_points(coords)
         in_field = np.array([xx for xx in range(len(tab0)) if cp_res[xx] == True])
