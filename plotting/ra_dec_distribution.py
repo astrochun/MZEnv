@@ -21,6 +21,7 @@ from astropy.table import Table
 from astropy import log
 
 import matplotlib.patches as mpatches # + on 01/03/2018
+from matplotlib.path import Path as Path0 # + on 03/03/2018
 
 from .. import read_catalog
 from .. import subsample
@@ -56,6 +57,9 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     -------
      ax with Rectangular patch added
 
+     verts0 : list
+       List containing vertices for each Rectangle patch
+
     Notes
     -----
     Created by Chun Ly, 1 March 2018
@@ -64,6 +68,7 @@ def plot_deimos_fov(ax, coord, pa=0.0):
      - Loop over each position to overlay Rectangle patch
      - Sign handling and matrix rotation fix so positive PA is indeed E of N
      - Update documentation
+     - Get vertices of Rectangle patch and return list of vertices
     '''
 
     dx0 =  5.0 / 60.0 # in deg
@@ -73,6 +78,8 @@ def plot_deimos_fov(ax, coord, pa=0.0):
     ybox0 = np.array([-1, 1, 1,-1])*dy0/2.0
 
     n_ptgs = len(coord) # + on 03/03/2018
+
+    verts0 = [] # + on 03/03/2018
 
     # Mod on 03/03/2018
     for cc in range(n_ptgs):
@@ -88,10 +95,13 @@ def plot_deimos_fov(ax, coord, pa=0.0):
         ax.scatter([coord[cc][0]], [coord[cc][1]])
         rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=-1*pa[cc], alpha=0.33,
                                   ec="r", color="r") # Sign flip
+
+        # Must be done before ax.add_patch call | + on 03/03/2018
+        verts0.append(rect.get_verts())
         ax.add_patch(rect)
     #endfor
 
-    return ax
+    return ax, verts0 # Mod on 03/03/2018
 #enddef
 
 def plot_hecto_fov(ax, coord):
