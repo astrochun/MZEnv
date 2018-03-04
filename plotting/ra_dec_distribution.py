@@ -29,6 +29,59 @@ from .. import paths
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
 
+def in_deimos_field(tab0, verts0, silent=False, verbose=True):
+    '''
+    Determine sources in Keck/DEIMOS field
+
+    Parameters
+    ----------
+    tab0 : astropy.table.table.Table
+      Astropy Table of HSC-SSP NB excess emitter catalog.
+
+    verts0 : list
+      List of matplotlib.patches.Rectangle vertices
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+
+    Returns
+    -------
+    in_fields0 : list
+      List of numpy arrays
+
+    Notes
+    -----
+    Created by Chun Ly, 3 March 2018
+    '''
+
+    if silent == False: log.info('### Begin in_deimos_field : '+systime())
+
+    ra  = tab0['ra'].data
+    dec = tab0['dec'].data
+    coords = np.array([ra, dec]).transpose()
+
+    n_ptgs = len(patches)
+
+    in_field0 = []
+    for cc in range(n_ptgs):
+        print patches[cc]
+        t_path = Path0(patches[cc])
+
+        cp_res = t_path.contains_points(coords)
+        in_field = np.array([xx for xx in range(len(tab0)) if cp_res[xx] == True])
+        print cc, len(in_field)
+        in_field0.append(in_field)
+    #endfor
+
+    if silent == False: log.info('### End in_deimos_field : '+systime())
+    return in_field0
+
+#enddef
+
+
 def plot_deimos_fov(ax, coord, pa=0.0):
     '''
     Overlay Keck/DEIMOS FoV on image
