@@ -251,6 +251,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     Modified by Chun Ly, 4 March 2018
      - Call in_deimos_field()
      - Create table of targets in DEIMOS field, deimos_tab0
+    Modified by Chun Ly, 5 March 2018
+     - Write table of targets in DEIMOS field to LaTeX files
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -374,7 +376,12 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                 names0 = ['MaskName'] + \
                          [val.replace('NB0','NB') for val in sub_dict0.keys()]
                 deimos_tab0 = Table(fld_arr0, names=names0)
-                deimos_tab0.pprint(max_lines=-1)
+
+                # + on 05/03/2018
+                if silent == False: deimos_tab0.pprint(max_lines=-1)
+                tab_outfile = dir0+'catalogs/'+t_field+'_deimos.tex'
+                if silent == False: log.info('### Writing : '+tab_outfile)
+                deimos_tab0.write(tab_outfile, format='ascii.latex')
             #endif
         #endif
 
