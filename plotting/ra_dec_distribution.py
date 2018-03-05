@@ -253,6 +253,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Create table of targets in DEIMOS field, deimos_tab0
     Modified by Chun Ly, 5 March 2018
      - Write table of targets in DEIMOS field to LaTeX files
+     - Include RA, Dec, PA in DEIMOS target field table
+     - Simplify fld_arr0 cmd for exec
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -371,10 +373,16 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                     #endfor
                 #endfor
                 t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
-                cmd3 = "fld_arr0 = [ptg_tab['MaskName'][d_idx], "+', '.join(t_cols)+']'
+
+                # Mod on 05/03/2018
+                ptg_tab_d = ptg_tab[d_idx]
+                fld_arr0 = [ptg_tab_d['MaskName'].data, ptg_tab_d['RA'].data,
+                            ptg_tab_d['Dec'].data, ptg_tab_d['PA'].data]
+                names0 = ['MaskName', 'RA', 'Dec', 'PA']
+
+                cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
                 exec(cmd3)
-                names0 = ['MaskName'] + \
-                         [val.replace('NB0','NB') for val in sub_dict0.keys()]
+                names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
                 deimos_tab0 = Table(fld_arr0, names=names0)
 
                 # + on 05/03/2018
