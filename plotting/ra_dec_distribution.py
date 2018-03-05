@@ -84,7 +84,7 @@ def in_deimos_field(tab0, verts0, silent=False, verbose=True):
 #enddef
 
 
-def plot_deimos_fov(ax, coord, pa=0.0):
+def plot_deimos_fov(ax, coord, maskno, pa=0.0):
     '''
     Overlay Keck/DEIMOS FoV on image
 
@@ -97,6 +97,9 @@ def plot_deimos_fov(ax, coord, pa=0.0):
       Central RA,Dec coordinate provided in degrees. Each position is provided
       as a list within the main list.
       coord = [ [RA1,Dec1], [RA2,Dec2], ...]
+
+    maskno : list
+      List of strings for mask name shorthand to overlay on top of mask
 
     pa : list
       List of PA in degrees for DEIMOS orientation. Positive is E of North.
@@ -124,6 +127,8 @@ def plot_deimos_fov(ax, coord, pa=0.0):
      - Sign handling and matrix rotation fix so positive PA is indeed E of N
      - Update documentation
      - Get vertices of Rectangle patch and return list of vertices
+    Modified by Chun Ly, 5 March 2018
+     - Add maskno input for ax.text annotation
     '''
 
     dx0 =  5.0 / 60.0 # in deg
@@ -147,7 +152,13 @@ def plot_deimos_fov(ax, coord, pa=0.0):
         ybox = coord[cc][1] + yprime
 
         xy_low = [xbox[3], ybox[3]]
-        ax.scatter([coord[cc][0]], [coord[cc][1]])
+
+        # + on 05/03/2018
+        t_rot0 = -90+pa[cc] if pa[cc] > 0 else 90+pa[cc]
+        ax.text(coord[cc][0], coord[cc][1], maskno[cc], ha='center', va='center',
+                rotation=t_rot0)
+
+        #ax.scatter([coord[cc][0]], [coord[cc][1]])
         rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=-1*pa[cc], alpha=0.33,
                                   ec="r", color="r") # Sign flip
 
