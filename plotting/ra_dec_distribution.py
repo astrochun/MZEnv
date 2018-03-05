@@ -266,6 +266,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Write table of targets in DEIMOS field to LaTeX files
      - Include RA, Dec, PA in DEIMOS target field table
      - Simplify fld_arr0 cmd for exec
+     - Define and pass maskno into plot_deimos_fov()
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -365,7 +366,10 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                     a_coord.append([t_tab['RA'], t_tab['Dec']])
                     pa.append(t_tab['PA'])
 
-                ax, deimos_verts0 = plot_deimos_fov(ax, a_coord, pa=pa)
+                # Mod on 05/03/2018
+                maskno = [mname.replace(t_field+'-D','') for
+                          mname in ptg_tab['MaskName'][d_idx].data]
+                ax, deimos_verts0 = plot_deimos_fov(ax, a_coord, maskno, pa=pa)
 
                 # + on 04/03/2018
                 deimos_fld_idx = in_deimos_field(tab0, deimos_verts0,
