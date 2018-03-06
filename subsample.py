@@ -207,6 +207,8 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
      - Call summary_table()
      - Call paths module to get path
      - Write ASCII-formatted subsample summary table
+    Modified by Chun Ly, 6 March 2018
+     - Sort by name so Ha is listed before OIII and then OII
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -228,6 +230,8 @@ def main(tab0=None, field='', dr='pdr1', silent=False, verbose=True):
     subsam = [a+'_'+b for a,b in zip(em_line, tab0['nb'])]
 
     subsam0 = list(set(subsam))
+    subsam0.sort() # + on 06/03/2018
+
     if silent == False:
         log.info('### Here are the subsamples : '+', '.join(subsam0))
 
