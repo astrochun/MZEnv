@@ -267,6 +267,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Include RA, Dec, PA in DEIMOS target field table
      - Simplify fld_arr0 cmd for exec
      - Define and pass maskno into plot_deimos_fov()
+    Modified by Chun Ly, 7 March 2018
+     - Get average RA and Dec for fields
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -307,6 +309,11 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
 
     for t_field in gal_field0:
         f_idx = gal_dict0[t_field] # Mod on 01/03/2018
+
+        # + on 07/03/2018
+        RA_avg = np.average(ra0[f_idx])
+        DE_avg = np.average(dec0[f_idx])
+        print 'RA/DE avg : ', t_field, RA_avg, DE_avg
 
         fig, ax = plt.subplots()
 
