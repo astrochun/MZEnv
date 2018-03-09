@@ -129,6 +129,8 @@ def plot_deimos_fov(ax, coord, maskno, pa=0.0):
      - Get vertices of Rectangle patch and return list of vertices
     Modified by Chun Ly, 5 March 2018
      - Add maskno input for ax.text annotation
+    Modified by Chun Ly, 9 March 2018
+     - Change color/style scheme for mpatches.Rectangle
     '''
 
     dx0 =  5.0 / 60.0 # in deg
@@ -159,8 +161,8 @@ def plot_deimos_fov(ax, coord, maskno, pa=0.0):
                 rotation=t_rot0)
 
         #ax.scatter([coord[cc][0]], [coord[cc][1]])
-        rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=-1*pa[cc], alpha=0.33,
-                                  ec="r", color="r") # Sign flip
+        rect = mpatches.Rectangle(xy_low, dx0, dy0, angle=-1*pa[cc],
+                                  linewidth=1.5, ec="k", color="none") # Sign flip
 
         # Must be done before ax.add_patch call | + on 03/03/2018
         verts0.append(rect.get_verts())
