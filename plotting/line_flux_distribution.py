@@ -53,6 +53,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     Notes
     -----
     Created by Chun Ly, 13 March 2018
+     - Plotting aesthetics: Same binning and x limits for all em lines
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -83,6 +84,15 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     for t_field in gal_field0:
         f_idx = gal_dict0[t_field]
 
+        logFlux = tab0['line_flux_observed']
+        flux_min = np.min(logFlux[f_idx])
+        flux_max = np.max(logFlux[f_idx])
+
+        binsize = 0.1
+        f_start = flux_min - (flux_min - np.floor(flux_min)) % binsize - binsize
+        f_end   = flux_max + (flux_max - np.floor(flux_max)) % binsize + binsize
+        bins0   = np.arange(f_start,f_end, binsize)
+
         fig, ax_arr = plt.subplots(nrows=3, ncols=2)
         fig.suptitle(t_field, fontsize=14)
 
@@ -93,14 +103,6 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
             t_idx = list(set(f_idx) & set(s_idx))
             print t_field, key, len(t_idx)
 
-            logFlux = tab0['line_flux_observed']
-            flux_min = np.min(logFlux[s_idx])
-            flux_max = np.max(logFlux[s_idx])
-
-            binsize = 0.1
-            f_start = flux_min - (flux_min - np.floor(flux_min)) % binsize
-            f_end   = flux_max + (flux_max - np.floor(flux_max)) % binsize
-            bins    = np.arange(f_start,f_end, binsize)
             if len(t_idx) > 0:
                 Flux = logFlux[t_idx]
 
@@ -116,8 +118,9 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                     col_title = key.replace('Ha_','').replace('NB0','NB')
                     t_ax.set_title(col_title, fontsize=12)
 
-                t_ax.hist(Flux, bins=bins, color=ctype[row], edgecolor='none',
+                t_ax.hist(Flux, bins=bins0, color=ctype[row], edgecolor='none',
                           alpha=0.5, histtype='stepfilled', align='mid')
+                t_ax.set_xlim([f_start, f_end])
                 if row < 2:
                     t_ax.xaxis.set_ticklabels([])
                 else:
