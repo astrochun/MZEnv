@@ -21,6 +21,8 @@ from .. import read_catalog
 from .. import subsample
 from .. import paths
 
+deimos_limit = np.log10(5e-18) # 5-sigma for 1.5 hr
+
 def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
          verbose=True):
 
@@ -56,6 +58,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Plotting aesthetics: Same binning and x limits for all em lines
      - Plotting aesthetics: Remove subplots if no data
      - Plotting aesthetics: White space improvements
+     - Plot DEIMOS sensitivity when specified
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -132,6 +135,16 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                 t_ax.annotate(emline[row], [0.975,0.95], va='top', ha='right',
                               xycoords='axes fraction', fontsize=10)
                 t_ax.minorticks_on()
+
+                if DEIMOS:
+                    if row == 0:
+                        # This is for A(Ha) = 1 and 10-sigma limit
+                        Hb_lim = deimos_limit + np.log10(4.22 * 10/5.)
+                        t_ax.axvline(Hb_lim, ymin=0.90, ymax=0.975, color='k')
+                        text0 = r'H$\beta$ S/N=10'+'\n'+r'A(H$\alpha$)=1'
+                        ymin, ymax = t_ax.get_ylim()
+                        t_ax.text(Hb_lim+0.05, ymax*0.975, text0, fontsize=8,
+                                  ha='left', va='top')
             else:
                 t_ax.axis('off')
         #endfor
