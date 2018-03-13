@@ -55,6 +55,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     Created by Chun Ly, 13 March 2018
      - Plotting aesthetics: Same binning and x limits for all em lines
      - Plotting aesthetics: Remove subplots if no data
+     - Plotting aesthetics: White space improvements
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -135,7 +136,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                 t_ax.axis('off')
         #endfor
 
-        subplots_adjust(left=0.025, bottom=0.025, top=0.90, right=0.975,
+        subplots_adjust(left=0.025, bottom=0.025, top=0.95, right=0.975,
                         wspace=0.13, hspace=0.04)
         fig.set_size_inches(8.0, 10)
         fig.savefig(pp, format='pdf', bbox_inches='tight')
