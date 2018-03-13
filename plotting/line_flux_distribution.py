@@ -54,6 +54,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     -----
     Created by Chun Ly, 13 March 2018
      - Plotting aesthetics: Same binning and x limits for all em lines
+     - Plotting aesthetics: Remove subplots if no data
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -89,8 +90,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
         flux_max = np.max(logFlux[f_idx])
 
         binsize = 0.1
-        f_start = flux_min - (flux_min - np.floor(flux_min)) % binsize - binsize
-        f_end   = flux_max + (flux_max - np.floor(flux_max)) % binsize + binsize
+        f_start = flux_min - (flux_min - np.floor(flux_min)) % binsize - 0.10
+        f_end   = flux_max + (flux_max - np.floor(flux_max)) % binsize + 0.05
         bins0   = np.arange(f_start,f_end, binsize)
 
         fig, ax_arr = plt.subplots(nrows=3, ncols=2)
@@ -103,17 +104,18 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
             t_idx = list(set(f_idx) & set(s_idx))
             print t_field, key, len(t_idx)
 
+            if 'Ha_'   in key: row = 0
+            if 'OIII_' in key: row = 1
+            if 'OII_'  in key: row = 2
+
+            if 'NB0816' in key: col = 0
+            if 'NB0921' in key: col = 1
+
+            t_ax = ax_arr[row,col]
+
             if len(t_idx) > 0:
                 Flux = logFlux[t_idx]
 
-                if 'Ha_'   in key: row = 0
-                if 'OIII_' in key: row = 1
-                if 'OII_'  in key: row = 2
-
-                if 'NB0816' in key: col = 0
-                if 'NB0921' in key: col = 1
-
-                t_ax = ax_arr[row,col]
                 if row == 0:
                     col_title = key.replace('Ha_','').replace('NB0','NB')
                     t_ax.set_title(col_title, fontsize=12)
@@ -129,11 +131,12 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                 t_ax.annotate(emline[row], [0.975,0.95], va='top', ha='right',
                               xycoords='axes fraction', fontsize=10)
                 t_ax.minorticks_on()
-            #endif
+            else:
+                t_ax.axis('off')
         #endfor
 
         subplots_adjust(left=0.025, bottom=0.025, top=0.90, right=0.975,
-                        wspace=0.13, hspace=0.02)
+                        wspace=0.13, hspace=0.04)
         fig.set_size_inches(8.0, 10)
         fig.savefig(pp, format='pdf', bbox_inches='tight')
         plt.close()
