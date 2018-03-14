@@ -99,6 +99,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Plotting aesthetics: White space improvements
      - Plot DEIMOS sensitivity when specified
      - Call sens_overlay() function for Hb line
+     - Handle Hb line overlay for Ha and [OIII] emitters
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -181,8 +182,16 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         # This is for A(Ha) = 1 and 10-sigma limit
                         Hb_lim = deimos_limit + np.log10(4.22 * 10/5.)
                         text0 = r'H$\beta$ S/N=10'+'\n'+r'A(H$\alpha$)=1'
+                    if row == 1:
+                        # This is for [OIII]/Hb = 5 and 10-sigma limit
+                        Hb_lim = deimos_limit + np.log10(5 * 10/5.)
+                        text0 = r'H$\beta$ S/N=10'+'\n'+r'[OIII]/H$\beta$=5'
+
+                    if row <= 1:
                         sens_overlay(t_ax, Hb_lim, text0, ymin=0.90, ymax=0.975,
-                                     color='k')
+                                     color='r')
+
+                #endif
             else:
                 t_ax.axis('off')
         #endfor
