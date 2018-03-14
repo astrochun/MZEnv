@@ -101,6 +101,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Call sens_overlay() function for Hb line
      - Handle Hb line overlay for Ha and [OIII] emitters
      - Add [OIII]5007 sensitivity for Ha emitters
+     - Add [OIII]4363 sensitivity for Ha and [OIII] emitters
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -198,6 +199,14 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         text0 = r'[OIII] S/N=100'+'\n'+r'[OIII]/H$\alpha$=1'
                         sens_overlay(t_ax, OIII_lim, text0, ymin=0.80,
                                      ymax=0.875, color='g')
+
+                    if row <=1:
+                        # OIII/Ha = 1 and 4363/5007=0.01, 3-sigma limit
+                        OIIIa_lim = deimos_limit + np.log10(3./5/0.01)
+                        text0 = r'[OIII]$\lambda$4363 S/N=3'+'\n'+\
+                                r'[OIII]$\lambda$4363/[OIII]$\lambda$5007=0.01'
+                        sens_overlay(t_ax, OIIIa_lim, text0, ymin=0.70,
+                                     ymax=0.775, color='g')
 
                 #endif
             else:
