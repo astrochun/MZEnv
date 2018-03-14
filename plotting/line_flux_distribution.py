@@ -23,6 +23,45 @@ from .. import paths
 
 deimos_limit = np.log10(5e-18) # 5-sigma for 1.5 hr
 
+def sens_overlay(t_ax, limit, text0, ymin=0.90, ymax=0.975, color='k'):
+    '''
+    Draw vertical lines for sensitivity and label them
+
+    Parameters
+    ----------
+    t_ax : matplotlib.axes._subplots.AxesSubplot
+      Matplotlib axes from plt.subplots()
+
+    limit : flux limit value in log units
+
+    text0 : str
+      String for annotation
+
+    ymin : float
+      Minimum value to draw vertical line. Default: 0.90
+
+    ymax : float
+      Maximum value to draw vertical line. Default: 0.975
+
+    color : str
+      Color of line. Default: black
+
+    Returns
+    -------
+      t_ax with vertical line and text annotation
+
+    Notes
+    -----
+    Created by Chun Ly, 13 March 2018
+    '''
+
+    t_ax.axvline(limit, ymin=ymin, ymax=ymax, color=color)
+    ax_ymin, ax_ymax = t_ax.get_ylim()
+    t_ax.text(limit+0.05, ax_ymax*ymax, text0, fontsize=8, ha='left', va='top')
+
+    return t_ax
+#enddef
+
 def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
          verbose=True):
 
