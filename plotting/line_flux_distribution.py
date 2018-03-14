@@ -103,6 +103,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Add [OIII]5007 sensitivity for Ha emitters
      - Add [OIII]4363 sensitivity for Ha and [OIII] emitters
      - Add [OII] sensitivity for Ha, [OIII], and [OII] emitters
+    Modified by Chun Ly, 14 March 2018
+     - Determine fraction of sources detected for various emission lines
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -121,6 +123,11 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
 
     gal_field0 = gal_dict0.keys() # Unique galaxy field list
 
+    # + on 14/03/2018
+    det_Hb    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    det_Hg    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    det_OIIIa = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+
     out_pdf = dir0+'plots/'+field+'_line_flux.pdf'
     if silent == False: log.info('Output PDF : '+out_pdf)
     pp = PdfPages(out_pdf)
@@ -130,6 +137,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     emline = [r'H$\alpha$',r'[OIII]$\lambda$5007',r'[OII]$\lambda$3727']
     ctype = ['r', 'g', 'b'] # for Ha, [OIII], [OII]
 
+    ff = 0
     for t_field in gal_field0:
         f_idx = gal_dict0[t_field]
 
@@ -145,6 +153,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
         fig, ax_arr = plt.subplots(nrows=3, ncols=2)
         fig.suptitle(t_field, fontsize=14)
 
+        ss = 0 # Count for indexing | + on 14/03/2018
         for key in sub_dict0.keys():
             s_idx = sub_dict0[key]
 
@@ -194,6 +203,12 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         sens_overlay(t_ax, Hb_lim, text0, ymin=0.90, ymax=0.975,
                                      color='r')
 
+                        # + on 14/03/2018
+                        Hb_lim5 = Hb_lim - np.log10(2.0) # This is for 5-sigma
+                        Hb_idx = [xx for xx in range(len(Flux)) if
+                                  Flux[xx] >= Hb_lim5]
+                        det_Hb[ff,ss] = np.float(len(Hb_idx))/len(Flux) * 100.0
+
                     if row == 0:
                         # OIII/Ha = 1 and 100-sigma limit
                         OIII_lim = deimos_limit + np.log10(100/5.)
@@ -208,6 +223,11 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                                 r'[OIII]$\lambda$4363/[OIII]$\lambda$5007=0.01'
                         sens_overlay(t_ax, OIIIa_lim, text0, ymin=0.70,
                                      ymax=0.775, color='g')
+
+                        # + on 14/03/2018
+                        OIIIa_idx = [xx for xx in range(len(Flux)) if
+                                     Flux[xx] >= OIIIa_lim]
+                        det_OIIIa[ff,ss] = np.float(len(OIIIa_idx))/len(Flux)*100.0
 
                     # [OII] fluxes
                     if row == 0:
@@ -224,6 +244,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                 #endif
             else:
                 t_ax.axis('off')
+
+            ss += 1 # + on 14/03/2018
         #endfor
 
         subplots_adjust(left=0.025, bottom=0.025, top=0.95, right=0.975,
@@ -232,7 +254,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
         fig.savefig(pp, format='pdf', bbox_inches='tight')
         plt.close()
         fig.clear()
-
+        ff += 1 # + on 14/03/2018
     #endfor
 
     if silent == False: log.info('Writing : '+out_pdf)
