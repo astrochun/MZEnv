@@ -105,6 +105,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Add [OII] sensitivity for Ha, [OIII], and [OII] emitters
     Modified by Chun Ly, 14 March 2018
      - Determine fraction of sources detected for various emission lines
+     - Add Hg limit determination
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -208,6 +209,12 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         Hb_idx = [xx for xx in range(len(Flux)) if
                                   Flux[xx] >= Hb_lim5]
                         det_Hb[ff,ss] = np.float(len(Hb_idx))/len(Flux) * 100.0
+
+                        # A(Ha)=0.1, CaseB, 3-sigma | + on 14/03/2018
+                        Hg_lim3 = deimos_limit + np.log10(11.07 * 3/5.)
+                        Hg_idx = [xx for xx in range(len(Flux)) if
+                                  Flux[xx] >= Hg_lim3]
+                        det_Hg[ff,ss] = np.float(len(Hg_idx))/len(Flux) * 100.0
 
                     if row == 0:
                         # OIII/Ha = 1 and 100-sigma limit
