@@ -16,6 +16,7 @@ from matplotlib.backends.backend_pdf import PdfPages
 from pylab import subplots_adjust
 
 from astropy import log
+from astropy.table import Table # + on 14/03/2018
 
 from .. import read_catalog
 from .. import subsample
@@ -107,6 +108,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Determine fraction of sources detected for various emission lines
      - Add Hg limit determination
      - Add [OII] limit determination
+     - Generate percentage summary table for various emission lines
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -126,10 +128,17 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     gal_field0 = gal_dict0.keys() # Unique galaxy field list
 
     # + on 14/03/2018
-    det_Hb    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
-    det_Hg    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
-    det_OIIIa = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
-    det_OII   = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    perc_Hb    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    perc_Hg    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    perc_OIIIa = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    perc_OII   = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+
+    # + on 14/03/2018
+    N_Hb    = np.zeros((len(gal_field0), len(sub_dict0.keys())), dtype=np.int)
+    N_Hg    = np.zeros((len(gal_field0), len(sub_dict0.keys())), dtype=np.int)
+    N_OIIIa = np.zeros((len(gal_field0), len(sub_dict0.keys())), dtype=np.int)
+    N_OII   = np.zeros((len(gal_field0), len(sub_dict0.keys())), dtype=np.int)
+    N_tot   = np.zeros((len(gal_field0), len(sub_dict0.keys())), dtype=np.int)
 
     out_pdf = dir0+'plots/'+field+'_line_flux.pdf'
     if silent == False: log.info('Output PDF : '+out_pdf)
@@ -193,6 +202,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                 t_ax.minorticks_on()
 
                 if DEIMOS:
+                    N_tot[ff,ss] = len(Flux) # + on 14/03/2018
+
                     if row == 0:
                         # This is for A(Ha) = 1 and 10-sigma limit
                         Hb_lim = deimos_limit + np.log10(4.22 * 10/5.)
@@ -210,13 +221,15 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         Hb_lim5 = Hb_lim - np.log10(2.0) # This is for 5-sigma
                         Hb_idx = [xx for xx in range(len(Flux)) if
                                   Flux[xx] >= Hb_lim5]
-                        det_Hb[ff,ss] = np.float(len(Hb_idx))/len(Flux) * 100.0
+                        perc_Hb[ff,ss] = np.float(len(Hb_idx))/len(Flux) * 100.0
+                        N_Hb[ff,ss] = len(Hb_idx) # + on 14/03/2018
 
                         # A(Ha)=0.1, CaseB, 3-sigma | + on 14/03/2018
                         Hg_lim3 = deimos_limit + np.log10(11.07 * 3/5.)
                         Hg_idx = [xx for xx in range(len(Flux)) if
                                   Flux[xx] >= Hg_lim3]
-                        det_Hg[ff,ss] = np.float(len(Hg_idx))/len(Flux) * 100.0
+                        perc_Hg[ff,ss] = np.float(len(Hg_idx))/len(Flux) * 100.0
+                        N_Hg[ff,ss] = len(Hg_idx) # + on 14/03/2018
 
                     if row == 0:
                         # OIII/Ha = 1 and 100-sigma limit
@@ -236,7 +249,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         # + on 14/03/2018
                         OIIIa_idx = [xx for xx in range(len(Flux)) if
                                      Flux[xx] >= OIIIa_lim]
-                        det_OIIIa[ff,ss] = np.float(len(OIIIa_idx))/len(Flux)*100.0
+                        perc_OIIIa[ff,ss] = np.float(len(OIIIa_idx))/len(Flux)*100.0
+                        N_OIIIa[ff,ss] = len(OIIIa_idx) # + on 14/03/2018
 
                     # [OII] fluxes
                     if row == 0:
@@ -254,7 +268,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                     # + on 14/03/2018
                     OII_lim10 = deimos_limit + np.log10(10/5.)
                     OII_idx = [xx for xx in range(len(Flux)) if Flux[xx] >= OII_lim10]
-                    det_OII[ff,ss] = np.float(len(OII_idx))/len(Flux)*100.0
+                    perc_OII[ff,ss] = np.float(len(OII_idx))/len(Flux)*100.0
+                    N_OII[ff,ss] = len(OII_idx) # + on 14/03/2018
 
                 #endif
             else:
@@ -262,6 +277,22 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
 
             ss += 1 # + on 14/03/2018
         #endfor
+
+        # Get tables of number of galaxies detected above limit for emission lines
+        # + on 14/03/2018
+        num_arr = [sub_dict0.keys(), N_tot[ff,:], perc_Hb[ff,:], N_Hb[ff],
+                   perc_Hg[ff,:], N_Hg[ff,:], perc_OIIIa[ff,:], N_OIIIa[ff,:],
+                   perc_OII[ff,:], N_OII[ff,:]]
+
+        num_names = ('Name','N_tot','perc_Hb','N_Hb','perc_Hg','N_Hg','perc_OIIIa',
+                     'N_OIIIa','perc_OII','N_OII')
+        num_tab0 = Table(num_arr, names=num_names)
+        good = np.where(num_tab0['N_tot'] != 0)[0]
+        num_tab0 = num_tab0[good]
+        num_tab0.pprint(max_width=-1)
+        out_num_tab_file = dir0+'catalogs/'+t_field+'_line_det_num.tbl'
+        if silent == False: log.info('### Writing : '+out_num_tab_file)
+        num_tab0.write(out_num_tab_file, format='ascii.fixed_width_two_line')
 
         subplots_adjust(left=0.025, bottom=0.025, top=0.95, right=0.975,
                         wspace=0.13, hspace=0.04)
