@@ -109,6 +109,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Add Hg limit determination
      - Add [OII] limit determination
      - Generate percentage summary table for various emission lines
+     - Bug fix: Incorrect [OII] SN=10 limit for Ha and [OIII] emitters
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -261,12 +262,13 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         text0 = r'[OII] S/N=10'+'\n'+r'[OII]/[OIII]=0.2'
                     if row == 2:
                         OII_lim = deimos_limit + np.log10(50/5.)
+                        OII_lim10 = deimos_limit + np.log10(10/5.)
                         text0 = r'[OII] S/N=50'
                     sens_overlay(t_ax, OII_lim, text0, ymin=0.80,
                                  ymax=0.875, color='b')
 
                     # + on 14/03/2018
-                    OII_lim10 = deimos_limit + np.log10(10/5.)
+                    if row <= 1: OII_lim10 = OII_lim
                     OII_idx = [xx for xx in range(len(Flux)) if Flux[xx] >= OII_lim10]
                     perc_OII[ff,ss] = np.float(len(OII_idx))/len(Flux)*100.0
                     N_OII[ff,ss] = len(OII_idx) # + on 14/03/2018
