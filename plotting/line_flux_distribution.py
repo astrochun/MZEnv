@@ -106,6 +106,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     Modified by Chun Ly, 14 March 2018
      - Determine fraction of sources detected for various emission lines
      - Add Hg limit determination
+     - Add [OII] limit determination
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -128,6 +129,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
     det_Hb    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
     det_Hg    = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
     det_OIIIa = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
+    det_OII   = np.zeros( (len(gal_field0), len(sub_dict0.keys())) )
 
     out_pdf = dir0+'plots/'+field+'_line_flux.pdf'
     if silent == False: log.info('Output PDF : '+out_pdf)
@@ -248,6 +250,12 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                         text0 = r'[OII] S/N=50'
                     sens_overlay(t_ax, OII_lim, text0, ymin=0.80,
                                  ymax=0.875, color='b')
+
+                    # + on 14/03/2018
+                    OII_lim10 = deimos_limit + np.log10(10/5.)
+                    OII_idx = [xx for xx in range(len(Flux)) if Flux[xx] >= OII_lim10]
+                    det_OII[ff,ss] = np.float(len(OII_idx))/len(Flux)*100.0
+
                 #endif
             else:
                 t_ax.axis('off')
