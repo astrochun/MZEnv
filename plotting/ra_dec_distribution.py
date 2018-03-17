@@ -271,6 +271,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Define and pass maskno into plot_deimos_fov()
     Modified by Chun Ly, 7 March 2018
      - Get average RA and Dec for fields
+    Modified by Chun Ly, 16 March 2018
+     - Overlay Hecto pointings from input coordinate list
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -417,10 +419,54 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
             #endif
         #endif
 
-        # Overlay Hecto FoV | + on 01/03/2018
+        # Overlay Hecto FoV | + on 01/03/2018, Mod on 16/03/2018
         if Hecto:
-            a_coord = [np.average(ra0[f_idx]), np.average(dec0[f_idx])]
-            ax = plot_hecto_fov(ax, a_coord)
+            h_idx = [xx for xx in range(len(ptg_tab)) if
+                     ((ptg_tab['Instr'][xx] == 'Hecto') and
+                      (ptg_tab['Field'][xx] == t_field))]
+            if len(h_idx) > 0:
+                a_coord = []
+                for cc in range(len(h_idx)):
+                    t_tab = ptg_tab[h_idx[cc]]
+                    a_coord.append([t_tab['RA'], t_tab['Dec']])
+
+                maskno = [mname.replace(t_field+'-H','') for
+                          mname in ptg_tab['MaskName'][h_idx].data]
+                ax = plot_hecto_fov(ax, a_coord, maskno)
+
+                hecto_fld_idx = in_hecto_field(tab0, a_coord, silent=silent,
+                                               verbose=verbose)
+
+                # Get subsample sizes in each Hecto pointing
+                for key in sub_dict0.keys():
+                    s_idx = sub_dict0[key]
+
+                    cmd1 = 'n_fld_%s = np.zeros(len(f_idx), dtype=np.int)' % key
+                    exec(cmd1)
+                    for ff,in_field in zip(range(len(f_idx)),hecto_fld_idx):
+                        in_idx = list(set(in_field.tolist()) & set(s_idx))
+                        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
+                        exec(cmd2)
+                    #endfor
+                #endfor
+                t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
+
+                ptg_tab_h = ptg_tab[h_idx]
+                fld_arr0 = [ptg_tab_h['MaskName'].data, ptg_tab_h['RA'].data,
+                            ptg_tab_h['Dec'].data]
+                names0 = ['MaskName', 'RA', 'Dec']
+
+                cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
+                exec(cmd3)
+                names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
+                hecto_tab0 = Table(fld_arr0, names=names0)
+
+                if silent == False: hecto_tab0.pprint(max_lines=-1)
+                tab_outfile = dir0+'catalogs/'+t_field+'_hecto.tex'
+                if silent == False: log.info('### Writing : '+tab_outfile)
+                hecto_tab0.write(tab_outfile, format='ascii.latex')
+            #endif
+        #endif
 
         # Mod on 01/03/2018
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
