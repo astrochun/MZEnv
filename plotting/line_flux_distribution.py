@@ -110,6 +110,7 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
      - Add [OII] limit determination
      - Generate percentage summary table for various emission lines
      - Bug fix: Incorrect [OII] SN=10 limit for Ha and [OIII] emitters
+     - Change OIII4363/5007 line ratio
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -240,10 +241,10 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                                      ymax=0.875, color='g')
 
                     if row <=1:
-                        # OIII/Ha = 1 and 4363/5007=0.01, 3-sigma limit
-                        OIIIa_lim = deimos_limit + np.log10(3./5/0.01)
+                        # OIII/Ha = 1 and 4363/5007=0.015, 3-sigma limit
+                        OIIIa_lim = deimos_limit + np.log10(3./5/0.015)
                         text0 = r'[OIII]$\lambda$4363 S/N=3'+'\n'+\
-                                r'[OIII]$\lambda$4363/[OIII]$\lambda$5007=0.01'
+                                r'[OIII]$\lambda$4363/[OIII]$\lambda$5007=0.015'
                         sens_overlay(t_ax, OIIIa_lim, text0, ymin=0.70,
                                      ymax=0.775, color='g')
 
@@ -286,8 +287,8 @@ def main(field='', dr='pdr1', DEIMOS=False, Hecto=False, silent=False,
                    perc_Hg[ff,:], N_Hg[ff,:], perc_OIIIa[ff,:], N_OIIIa[ff,:],
                    perc_OII[ff,:], N_OII[ff,:]]
 
-        num_names = ('Name','N_tot','perc_Hb','N_Hb','perc_Hg','N_Hg','perc_OIIIa',
-                     'N_OIIIa','perc_OII','N_OII')
+        num_names = ('Name','N_tot','perc_Hb','N_Hb','perc_Hg','N_Hg',
+                     'perc_OIIIa','N_OIIIa','perc_OII','N_OII')
         num_tab0 = Table(num_arr, names=num_names)
         good = np.where(num_tab0['N_tot'] != 0)[0]
         num_tab0 = num_tab0[good]
