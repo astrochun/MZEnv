@@ -172,6 +172,56 @@ def plot_deimos_fov(ax, coord, maskno, pa=0.0):
     return ax, verts0 # Mod on 03/03/2018
 #enddef
 
+def in_hecto_field(tab0, fld_coord, silent=False, verbose=True):
+    '''
+    Determine sources in MMT/Hectospec field
+
+    Parameters
+    ----------
+    tab0 : astropy.table.table.Table
+      Astropy Table of HSC-SSP NB excess emitter catalog.
+
+    fld_coord : list
+      List of RA,Dec coordinate set
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+
+    Returns
+    -------
+    in_fields0 : list
+      List of numpy arrays
+
+    Notes
+    -----
+    Created by Chun Ly, 16 March 2018
+    '''
+
+    if silent == False: log.info('### Begin in_hecto_field : '+systime())
+
+    ra  = tab0['ra'].data
+    dec = tab0['dec'].data
+
+    n_ptgs = len(fld_coord)
+
+    in_field0 = []
+    for cc in range(n_ptgs):
+        ra_diff0  = ra  - fld_coord[cc][0]
+        dec_diff0 = dec - fld_coord[cc][1]
+        diff0 = np.sqrt(ra_diff0**2 + dec_diff0**2)
+        in_field = np.array([xx for xx in range(len(tab0)) if
+                             diff0[xx] <= 0.50])
+        print cc, len(in_field)
+        in_field0.append(in_field)
+    #endfor
+
+    if silent == False: log.info('### End in_hecto_field : '+systime())
+    return in_field0
+#enddef
+
 def plot_hecto_fov(ax, coord, configno):
     '''
     Overlay MMT/Hecto FoV on image
@@ -280,8 +330,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Get average RA and Dec for fields
     Modified by Chun Ly, 16 March 2018
      - Overlay Hecto pointings from input coordinate list
+     - Hecto sub-code tested. Bug fix: f_idx -> h_idx
     '''
-    
+
     if silent == False: log.info('### Begin main : '+systime())
 
     if field == '':
@@ -441,37 +492,37 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                           mname in ptg_tab['MaskName'][h_idx].data]
                 ax = plot_hecto_fov(ax, a_coord, maskno)
 
-                #hecto_fld_idx = in_hecto_field(tab0, a_coord, silent=silent,
-                #                               verbose=verbose)
-                #
-                ## Get subsample sizes in each Hecto pointing
-                #for key in sub_dict0.keys():
-                #    s_idx = sub_dict0[key]
-                #
-                #    cmd1 = 'n_fld_%s = np.zeros(len(f_idx), dtype=np.int)' % key
-                #    exec(cmd1)
-                #    for ff,in_field in zip(range(len(f_idx)),hecto_fld_idx):
-                #        in_idx = list(set(in_field.tolist()) & set(s_idx))
-                #        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
-                #        exec(cmd2)
-                #    #endfor
-                ##endfor
-                #t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
-                #
-                #ptg_tab_h = ptg_tab[h_idx]
-                #fld_arr0 = [ptg_tab_h['MaskName'].data, ptg_tab_h['RA'].data,
-                #            ptg_tab_h['Dec'].data]
-                #names0 = ['MaskName', 'RA', 'Dec']
-                #
-                #cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
-                #exec(cmd3)
-                #names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
-                #hecto_tab0 = Table(fld_arr0, names=names0)
-                #
-                #if silent == False: hecto_tab0.pprint(max_lines=-1)
-                #tab_outfile = dir0+'catalogs/'+t_field+'_hecto.tex'
-                #if silent == False: log.info('### Writing : '+tab_outfile)
-                #hecto_tab0.write(tab_outfile, format='ascii.latex')
+                hecto_fld_idx = in_hecto_field(tab0, a_coord, silent=silent,
+                                               verbose=verbose)
+
+                # Get subsample sizes in each Hecto pointing
+                for key in sub_dict0.keys():
+                    s_idx = sub_dict0[key]
+
+                    cmd1 = 'n_fld_%s = np.zeros(len(h_idx), dtype=np.int)' % key
+                    exec(cmd1)
+                    for ff,in_field in zip(range(len(h_idx)),hecto_fld_idx):
+                        in_idx = list(set(in_field.tolist()) & set(s_idx))
+                        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
+                        exec(cmd2)
+                    #endfor
+                #endfor
+                t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
+
+                ptg_tab_h = ptg_tab[h_idx]
+                fld_arr0 = [ptg_tab_h['MaskName'].data, ptg_tab_h['RA'].data,
+                            ptg_tab_h['Dec'].data]
+                names0 = ['MaskName', 'RA', 'Dec']
+
+                cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
+                exec(cmd3)
+                names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
+                hecto_tab0 = Table(fld_arr0, names=names0)
+
+                if silent == False: hecto_tab0.pprint(max_lines=-1)
+                tab_outfile = dir0+'catalogs/'+t_field+'_hecto.tex'
+                if silent == False: log.info('### Writing : '+tab_outfile)
+                hecto_tab0.write(tab_outfile, format='ascii.latex')
             #endif
         #endif
 
