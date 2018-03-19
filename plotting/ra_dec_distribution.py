@@ -260,6 +260,35 @@ def plot_hecto_fov(ax, coord, configno):
     return ax
 #enddef
 
+def overlay_primus(PRIMUS_tab0, ax):
+    '''
+    Overlay PRIMUS pointings
+
+    Parameters
+    ----------
+
+    Returns
+    -------
+    ax with Circle patch added
+
+    Notes
+    -----
+    Created by Chun Ly, 19 March 2018
+    '''
+
+    c_ra  = PRIMUS_tab0['RACEN'].data
+    c_dec = PRIMUS_tab0['DECCEN'].data
+
+    for ii in range(len(PRIMUS_tab0)):
+        coord = [c_ra[ii], c_dec[ii]]
+        circ = mpatches.Circle(coord, radius=27.2/60.0, alpha=0.5, ec="purple",
+                               color="none", linewidth=1.5)
+        ax.add_patch(circ)
+    #endfor
+
+    return ax
+#enddef
+
 def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
          silent=False, verbose=True):
 
