@@ -360,6 +360,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     Modified by Chun Ly, 16 March 2018
      - Overlay Hecto pointings from input coordinate list
      - Hecto sub-code tested. Bug fix: f_idx -> h_idx
+    Modified by Chun Ly, 19 March 2018
+     - Read in PRIMUS catalog; Call overlay_primus()
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -377,6 +379,10 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         field_coord_file = dir0 + 'field_coordinates.txt'
         if silent == False: log.info('### Writing : '+field_coord_file)
         ptg_tab = asc.read(field_coord_file)
+
+    # + on 19/03/2018
+    PRIMUS_cat_file = dir0 + 'catalogs/primus/PRIMUS_mask_centers.txt'
+    PRIMUS_tab0     = asc.read(PRIMUS_cat_file)
 
     tab0 = read_catalog.main(field=field, dr=dr, silent=silent, verbose=verbose)
     ra0, dec0 = tab0['ra'], tab0['dec']
@@ -451,6 +457,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         ncol = 3 if n_subsample % 3 == 0 else 2
         ax.legend(loc='lower center', ncol=ncol, frameon=False, fontsize=10,
                   framealpha=0.9)
+
+        # Overlay PRIMUS pointings | + on 19/03/2018
+        ax = overlay_primus(PRIMUS_tab0, ax)
 
         # Overlay DEIMOS FoV | + on 01/03/2018, Mod on 03/03/2018
         if DEIMOS:
