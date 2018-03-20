@@ -23,6 +23,10 @@ from astropy import log
 import matplotlib.patches as mpatches # + on 01/03/2018
 from matplotlib.path import Path as Path0 # + on 03/03/2018
 
+# + on 19/03/2018
+import shapely.geometry as sg
+import descartes
+
 from .. import read_catalog
 from .. import subsample
 from .. import paths
@@ -274,16 +278,20 @@ def overlay_primus(PRIMUS_tab0, ax):
     Notes
     -----
     Created by Chun Ly, 19 March 2018
+     - Use shapely and descartes to plot PRIMUS pointing as intersection
+       of square (27.2') and circle (radius=14.94')
     '''
 
     c_ra  = PRIMUS_tab0['RACEN'].data
     c_dec = PRIMUS_tab0['DECCEN'].data
 
+    bsz = 0.453/2.0 # in degree
     for ii in range(len(PRIMUS_tab0)):
         coord = [c_ra[ii], c_dec[ii]]
-        circ = mpatches.Circle(coord, radius=27.2/60.0, alpha=0.5, ec="purple",
-                               color="none", linewidth=1.5)
-        ax.add_patch(circ)
+        circ = sg.Point(coord[0],coord[1]).buffer(0.249) #30.0/60.0)
+        box  = sg.box(c_ra[ii]-bsz,c_dec[ii]-bsz,c_ra[ii]+bsz,c_dec[ii]+bsz)
+        int0 = circ.intersection(box)
+        ax.add_patch(descartes.PolygonPatch(int0, fc='none', ec='purple'))
     #endfor
 
     return ax
