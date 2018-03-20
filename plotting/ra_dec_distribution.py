@@ -17,6 +17,8 @@ import numpy as np
 
 import matplotlib.pyplot as plt
 
+import glob # + on 20/03/2018
+
 from astropy.table import Table
 from astropy import log
 
@@ -30,6 +32,7 @@ import descartes
 from .. import read_catalog
 from .. import subsample
 from .. import paths
+from . import ds9_mask_overlay # + on 20/03/2018
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
 
@@ -370,6 +373,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Hecto sub-code tested. Bug fix: f_idx -> h_idx
     Modified by Chun Ly, 19 March 2018
      - Read in PRIMUS catalog; Call overlay_primus()
+    Modified by Chun Ly, 20 March 2018
+     - Import and call ds9_mask_overlay() to overlay ds9 regions
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -468,6 +473,13 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
 
         # Overlay PRIMUS pointings | + on 19/03/2018
         ax = overlay_primus(PRIMUS_tab0, ax)
+
+        # Overlay ds9 masked regions | + on 20/03/2018
+        tmp_field = t_field.split('-')[-1].replace('_','-')
+        prefix = 'mask_dr1_s15b_'+field+'_NB0921_'+tmp_field+'*.reg'
+        ds9_file = glob.glob(dir0+'catalogs/masks_Hayashi+17/'+prefix)[0]
+        if silent == False: log.info('## ds9_file : '+ds9_file)
+        ds9_mask_overlay.main(ax, ds9_file, color='black', alpha=0.15)
 
         # Overlay DEIMOS FoV | + on 01/03/2018, Mod on 03/03/2018
         if DEIMOS:
