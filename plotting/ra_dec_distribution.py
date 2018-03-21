@@ -478,6 +478,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Import and call ds9_mask_overlay() to overlay ds9 regions
     Modified by Chun Ly, 21 March 2018
      - Add Bino boolean keyword and plot Binospec FoV when set
+     - Change out_pdf suffix for Bino and Hecto case
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -709,8 +710,13 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
         if noOII: out_pdf = out_pdf.replace('.pdf','.noOII.pdf')
         if DEIMOS: out_pdf = out_pdf.replace('.pdf', '.DEIMOS.pdf')
-        if Hecto: out_pdf = out_pdf.replace('.pdf', '.Hecto.pdf')
-        if Bino: out_pdf = out_pdf.replace('.pdf', '.Bino.pdf') # + on 21/03/2018
+        # Mod on 21/03/2018
+        if Hecto and Bino:
+            out_pdf = out_pdf.replace('.pdf', '.MMT.pdf')
+        else:
+            if Hecto: out_pdf = out_pdf.replace('.pdf', '.Hecto.pdf')
+            if Bino: out_pdf = out_pdf.replace('.pdf', '.Bino.pdf')
+
         if silent == False: log.info('## Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
