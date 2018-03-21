@@ -216,6 +216,7 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
     Notes
     -----
     Created by Chun Ly, 21 March 2018
+     - Bug fix to handle np.arrays combine and proper lower-left coordinates
     '''
 
     dx0 = 19.2 / 60.0 # for outside; in deg
@@ -242,23 +243,24 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
         yprime1 =  xbox1*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
 
         # side 1
-        xbox1 = coord[cc][0] + [xprime0[0:2], xprime1[2:]]
-        ybox1 = coord[cc][1] + [yprime0[0:2], yprime1[2:]]
+        xbox1 = coord[cc][0] + np.append(xprime0[0:2], xprime1[0:2])
+        ybox1 = coord[cc][1] + np.append(yprime0[0:2],
+                                         np.flip(yprime1[0:2], axis=0))
 
         # side 2
-        xbox2 = coord[cc][0] + [xprime1[0:2], xprime0[2:]]
-        ybox2 = coord[cc][1] + [yprime1[0:2], yprime0[2:]]
+        xbox2 = coord[cc][0] + np.append(xprime1[2:], xprime0[2:])
+        ybox2 = coord[cc][1] + np.append(yprime1[2:], yprime0[2:])
 
         xy_low1 = [xbox1[3], ybox1[3]]
         xy_low2 = [xbox2[3], ybox2[3]]
 
         t_rot0 = -90+pa[cc] if pa[cc] > 0 else 90+pa[cc]
-        ax.text(coord[cc][0], coord[cc][1], maskno[cc], ha='center', va='center',
-                rotation=t_rot0)
+        ax.text(coord[cc][0], coord[cc][1], maskno[cc], ha='center',
+                va='center', rotation=t_rot0)
 
-        rect1 = mpatches.Rectangle(xy_low1, dx1, dy0, angle=-1*pa[cc],
-                                  linewidth=1.5, ec="k", color="none")
-        rect2 = mpatches.Rectangle(xy_low2, dx1, dy0, angle=-1*pa[cc],
+        rect1 = mpatches.Rectangle(xy_low1, 8.0/60, dy0, angle=-1*pa[cc],
+                                   linewidth=1.5, ec="k", color="none")
+        rect2 = mpatches.Rectangle(xy_low2, 8.0/60, dy0, angle=-1*pa[cc],
                                    linewidth=1.5, ec="k", color="none")
 
         # Must be done before ax.add_patch call
