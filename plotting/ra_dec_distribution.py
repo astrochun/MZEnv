@@ -218,6 +218,7 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
     Created by Chun Ly, 21 March 2018
      - Bug fix to handle np.arrays combine and proper lower-left coordinates
      - Simplify handling of ybox1 box corners
+     - Bug fixes: Do some np.flip and fix typos: box1 -> boxs1
     '''
 
     dx0 = 19.2 / 60.0 # for outside; in deg
@@ -236,24 +237,24 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
         rad = -1*pa[cc]*np.pi/180.0 #Sign flip
 
         # outside
-        xprime0 =  xbox0*np.cos(rad) - ybox0*np.sin(rad) #Sign fix
-        yprime0 =  xbox0*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
+        xprime0 = xbox0*np.cos(rad) - ybox0*np.sin(rad) #Sign fix
+        yprime0 = xbox0*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
 
         # inside
-        xprime1 =  xbox1*np.cos(rad) - ybox0*np.sin(rad) #Sign fix
-        yprime1 =  xbox1*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
+        xprime1 = xbox1*np.cos(rad) - ybox0*np.sin(rad) #Sign fix
+        yprime1 = xbox1*np.sin(rad) + ybox0*np.cos(rad) #Sign fix
 
         # side 1
-        xbox1 = coord[cc][0] + np.append(xprime0[0:2], xprime1[0:2])
-        ybox1 = coord[cc][1] + np.append(yprime0[0:2], yprime1[2:])
+        xboxs1 = coord[cc][0] + np.append(xprime0[0:2], np.flip(xprime1[0:2], 0))
+        yboxs1 = coord[cc][1] + np.append(yprime0[0:2], np.flip(yprime1[0:2], 0))
         # Always get box corner in same order so last entry is lower left
 
         # side 2
-        xbox2 = coord[cc][0] + np.append(xprime1[2:], xprime0[2:])
-        ybox2 = coord[cc][1] + np.append(yprime1[2:], yprime0[2:])
+        xboxs2 = coord[cc][0] + np.append(xprime1[2:], xprime0[2:])
+        yboxs2 = coord[cc][1] + np.append(np.flip(yprime1[2:],0), yprime0[2:])
 
-        xy_low1 = [xbox1[3], ybox1[3]]
-        xy_low2 = [xbox2[3], ybox2[3]]
+        xy_low1 = [xboxs1[3], yboxs1[3]]
+        xy_low2 = [xboxs2[3], yboxs2[3]]
 
         t_rot0 = -90+pa[cc] if pa[cc] > 0 else 90+pa[cc]
         ax.text(coord[cc][0], coord[cc][1], maskno[cc], ha='center',
