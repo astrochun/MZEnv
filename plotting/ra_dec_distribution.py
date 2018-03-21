@@ -217,6 +217,7 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
     -----
     Created by Chun Ly, 21 March 2018
      - Bug fix to handle np.arrays combine and proper lower-left coordinates
+     - Simplify handling of ybox1 box corners
     '''
 
     dx0 = 19.2 / 60.0 # for outside; in deg
@@ -244,8 +245,8 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
 
         # side 1
         xbox1 = coord[cc][0] + np.append(xprime0[0:2], xprime1[0:2])
-        ybox1 = coord[cc][1] + np.append(yprime0[0:2],
-                                         np.flip(yprime1[0:2], axis=0))
+        ybox1 = coord[cc][1] + np.append(yprime0[0:2], yprime1[2:])
+        # Always get box corner in same order so last entry is lower left
 
         # side 2
         xbox2 = coord[cc][0] + np.append(xprime1[2:], xprime0[2:])
