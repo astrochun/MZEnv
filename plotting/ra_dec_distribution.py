@@ -283,6 +283,8 @@ def overlay_primus(PRIMUS_tab0, ax):
     Created by Chun Ly, 19 March 2018
      - Use shapely and descartes to plot PRIMUS pointing as intersection
        of square (27.2') and circle (radius=14.94')
+    Modified by Chun Ly, 21 March 2018
+     - Plotting aesthetics (transparent field boundaries)
     '''
 
     c_ra  = PRIMUS_tab0['RACEN'].data
@@ -294,7 +296,8 @@ def overlay_primus(PRIMUS_tab0, ax):
         circ = sg.Point(coord[0],coord[1]).buffer(0.249) #30.0/60.0)
         box  = sg.box(c_ra[ii]-bsz,c_dec[ii]-bsz,c_ra[ii]+bsz,c_dec[ii]+bsz)
         int0 = circ.intersection(box)
-        ax.add_patch(descartes.PolygonPatch(int0, fc='none', ec='purple'))
+        ax.add_patch(descartes.PolygonPatch(int0, fc='none', ec='purple',
+                                            alpha=0.3))
     #endfor
 
     return ax
