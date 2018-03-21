@@ -396,7 +396,7 @@ def overlay_primus(PRIMUS_tab0, ax):
 #enddef
 
 def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
-         silent=False, verbose=True):
+         Bino=False, silent=False, verbose=True):
 
     '''
     Main function to plot RA and Dec for each sub-sample of NB excess emitters
@@ -417,6 +417,9 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
 
     Hecto : boolean
       Indicate whether to plot MMT/Hecto FoV on PDF plots
+
+    Bino : boolean
+      Indicate whether to plot MMT/Bino FoV on PDF plots
 
     silent : boolean
       Turns off stdout messages. Default: False
@@ -470,6 +473,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Read in PRIMUS catalog; Call overlay_primus()
     Modified by Chun Ly, 20 March 2018
      - Import and call ds9_mask_overlay() to overlay ds9 regions
+    Modified by Chun Ly, 21 March 2018
+     - Add Bino boolean keyword and plot Binospec FoV when set
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -483,7 +488,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     dir0 = paths.gdrive() # Mod on 02/03/2018
 
     # + on 03/03/2018
-    if DEIMOS or Hecto:
+    if DEIMOS or Hecto or Bino:
         field_coord_file = dir0 + 'field_coordinates.txt'
         if silent == False: log.info('### Writing : '+field_coord_file)
         ptg_tab = asc.read(field_coord_file)
@@ -679,11 +684,30 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
             #endif
         #endif
 
+        # Overlay Binospec FoV | + on 21/03/2018
+        if Bino:
+            b_idx = [xx for xx in range(len(ptg_tab)) if
+                     ((ptg_tab['Instr'][xx] == 'Bino') and
+                      (ptg_tab['Field'][xx] == t_field))]
+            if len(b_idx) > 0:
+                pa = ptg_tab['PA'][b_idx].data
+                a_coord = []
+                for cc in range(len(b_idx)):
+                    t_tab = ptg_tab[b_idx[cc]]
+                    a_coord.append([t_tab['RA'], t_tab['Dec']])
+
+                maskno = [mname.replace(t_field+'-B','') for
+                          mname in ptg_tab['MaskName'][b_idx].data]
+                ax, deimos_verts0 = plot_bino_fov(ax, a_coord, maskno, pa=pa)
+            #endif
+        #endif
+
         # Mod on 01/03/2018
         out_pdf = dir0 + 'plots/' + t_field+'_radec.pdf'
         if noOII: out_pdf = out_pdf.replace('.pdf','.noOII.pdf')
         if DEIMOS: out_pdf = out_pdf.replace('.pdf', '.DEIMOS.pdf')
         if Hecto: out_pdf = out_pdf.replace('.pdf', '.Hecto.pdf')
+        if Bino: out_pdf = out_pdf.replace('.pdf', '.Bino.pdf') # + on 21/03/2018
         if silent == False: log.info('## Writing : '+out_pdf)
         fig.savefig(out_pdf, bbox_inches='tight')
 
