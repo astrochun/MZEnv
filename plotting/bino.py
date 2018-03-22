@@ -1,8 +1,71 @@
 import numpy as np
 
+from chun_codes import systime
 import matplotlib.patches as mpatches
+from matplotlib.path import Path as Path0
 
 from astropy import log
+
+def in_bino_field(tab0, verts0, silent=False, verbose=True):
+    '''
+    Determine sources in MMT/Binospec field
+
+    Parameters
+    ----------
+    tab0 : astropy.table.table.Table
+      Astropy Table of HSC-SSP NB excess emitter catalog.
+
+    verts0 : list
+      List of matplotlib.patches.Rectangle vertices
+
+    silent : boolean
+      Turns off stdout messages. Default: False
+
+    verbose : boolean
+      Turns on additional stdout messages. Default: True
+
+    Returns
+    -------
+    in_fields0 : list
+      List of numpy arrays
+
+    Notes
+    -----
+    Created by Chun Ly, 22 March 2018
+    '''
+
+    if silent == False: log.info('### Begin in_bino_field : '+systime())
+
+    ra  = tab0['ra'].data
+    dec = tab0['dec'].data
+    coords = np.array([ra, dec]).transpose()
+
+    n_ptgs = len(verts0)
+
+    in_field0 = []
+    for cc in range(n_ptgs):
+        # Side 1
+        t_path1   = Path0(verts0[cc][0])
+        cp_res1   = t_path1.contains_points(coords)
+        in_field1 = np.array([xx for xx in range(len(tab0)) if
+                              cp_res1[xx] == True])
+
+        # Side 2
+        t_path2   = Path0(verts0[cc][1])
+        cp_res2   = t_path2.contains_points(coords)
+        in_field2 = np.array([xx for xx in range(len(tab0)) if
+                              cp_res2[xx] == True])
+
+        print cc, len(in_field1), len(in_field2)
+        in_field = np.append(in_field1, in_field2)
+        in_field.sort()
+        in_field0.append(in_field)
+    #endfor
+
+    if silent == False: log.info('### End in_bino_field : '+systime())
+    return in_field0
+
+#enddef
 
 def plot_bino_fov(ax, coord, maskno, pa=0.0):
     '''
@@ -22,7 +85,7 @@ def plot_bino_fov(ax, coord, maskno, pa=0.0):
       List of strings for mask name shorthand to overlay on top of mask
 
     pa : list
-      List of PA in degrees for DEIMOS orientation. Positive is E of North.
+      List of PA in degrees for Binospec orientation. Positive is E of North.
       Default: 0.0 deg
 
     silent : boolean
