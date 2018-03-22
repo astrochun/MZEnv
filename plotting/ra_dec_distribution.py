@@ -36,6 +36,7 @@ from . import ds9_mask_overlay # + on 20/03/2018
 
 from .deimos import in_deimos_field, plot_deimos_fov # + on 21/03/2018
 from .hecto import in_hecto_field, plot_hecto_fov # + on 21/03/2018
+from .subsample_in_pointing import main as ss_in_ptg # + on 21/03/2018
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
 
@@ -253,6 +254,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Add Bino boolean keyword and plot Binospec FoV when set
      - Change out_pdf suffix for Bino and Hecto case
      - List comprehensions for mask/config centers
+     - Call subsample_in_pointing for DEIMOS fields
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -379,35 +381,10 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                                                  silent=silent, verbose=verbose)
 
                 # Get subsample sizes in each DEIMOS pointing | + on 04/03/2018
-                for key in sub_dict0.keys():
-                    s_idx = sub_dict0[key]
-
-                    cmd1 = 'n_fld_%s = np.zeros(len(d_idx), dtype=np.int)' % key
-                    exec(cmd1)
-                    for ff,in_field in zip(range(len(d_idx)),deimos_fld_idx):
-                        in_idx = list(set(in_field.tolist()) & set(s_idx))
-                        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
-                        exec(cmd2)
-                    #endfor
-                #endfor
-                t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
-
-                # Mod on 05/03/2018
-                ptg_tab_d = ptg_tab[d_idx]
-                fld_arr0 = [ptg_tab_d['MaskName'].data, ptg_tab_d['RA'].data,
-                            ptg_tab_d['Dec'].data, ptg_tab_d['PA'].data]
-                names0 = ['MaskName', 'RA', 'Dec', 'PA']
-
-                cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
-                exec(cmd3)
-                names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
-                deimos_tab0 = Table(fld_arr0, names=names0)
-
-                # + on 05/03/2018
-                if silent == False: deimos_tab0.pprint(max_lines=-1)
-                tab_outfile = dir0+'catalogs/'+t_field+'_deimos.tex'
-                if silent == False: log.info('### Writing : '+tab_outfile)
-                deimos_tab0.write(tab_outfile, format='ascii.latex')
+                # Mod on 21/03/2018
+                deimos_outfile = dir0+'catalogs/'+t_field+'_deimos.tex'
+                ss_in_ptg(sub_dict0, deimos_fld_idx, t_tab, 'DEIMOS',
+                          deimos_outfile, silent=silent, verbose=verbose)
             #endif
         #endif
 
