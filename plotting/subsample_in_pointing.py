@@ -32,6 +32,7 @@ def main(sub_dict0, fld_idx, fld_tab, Inst, tab_outfile, silent=False,
     Notes
     -----
     Created by Chun Ly, 21 March 2018
+     - Bug fix: with removing PA column in table
     '''
     
     if silent == False: log.info('### Begin main : '+systime())
@@ -58,7 +59,7 @@ def main(sub_dict0, fld_idx, fld_tab, Inst, tab_outfile, silent=False,
     names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
     inptg_tab0 = Table(fld_arr0, names=names0)
 
-    if Inst == 'Hecto': fld_arr0.remove_column('PA')
+    if Inst == 'Hecto': del inptg_tab0['PA']
     
     if silent == False: inptg_tab0.pprint(max_lines=-1)
     if silent == False: log.info('### Writing : '+tab_outfile)
