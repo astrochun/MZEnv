@@ -36,7 +36,7 @@ from . import ds9_mask_overlay # + on 20/03/2018
 
 from .deimos import in_deimos_field, plot_deimos_fov # + on 21/03/2018
 from .hecto import in_hecto_field, plot_hecto_fov # + on 21/03/2018
-from .bino import plot_bino_fov # + on 22/03/2018
+from .bino import in_bino_field, plot_bino_fov # + on 22/03/2018
 from .subsample_in_pointing import main as ss_in_ptg # + on 21/03/2018
 
 #bbox_props = dict(boxstyle="square,pad=0.15", fc="white", alpha=0.9, ec="none")
@@ -161,6 +161,8 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - List comprehensions for mask/config centers
      - Call subsample_in_pointing for DEIMOS fields
      - Call subsample_in_pointing for Hecto fields
+    Modified by Chun Ly, 22 March 2018
+     - Call in_bino_field()
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -329,7 +331,12 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
 
                 maskno = [mname.replace(t_field+'-B','') for
                           mname in t_tab['MaskName'].data]
-                ax, deimos_verts0 = plot_bino_fov(ax, a_coord, maskno, pa=pa)
+                ax, bino_verts0 = plot_bino_fov(ax, a_coord, maskno, pa=pa)
+
+                # + on 23/03/2018
+                bino_fld_idx = in_bino_field(tab0, bino_verts0,
+                                             silent=silent, verbose=verbose)
+
             #endif
         #endif
 
