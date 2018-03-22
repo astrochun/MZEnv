@@ -163,6 +163,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Call subsample_in_pointing for Hecto fields
     Modified by Chun Ly, 22 March 2018
      - Call in_bino_field()
+     - Call subsample_in_pointing for Bino fields
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -333,10 +334,14 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                           mname in t_tab['MaskName'].data]
                 ax, bino_verts0 = plot_bino_fov(ax, a_coord, maskno, pa=pa)
 
-                # + on 23/03/2018
+                # + on 22/03/2018
                 bino_fld_idx = in_bino_field(tab0, bino_verts0,
                                              silent=silent, verbose=verbose)
 
+                # Get subsample sizes in each Bino pointing | + on 22/03/2018
+                bino_outfile = dir0+'catalogs/'+t_field+'_bino.tex'
+                ss_in_ptg(sub_dict0, bino_fld_idx, t_tab, 'Bino',
+                          bino_outfile, silent=silent, verbose=verbose)
             #endif
         #endif
 
