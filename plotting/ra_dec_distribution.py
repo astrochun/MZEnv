@@ -252,6 +252,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
     Modified by Chun Ly, 21 March 2018
      - Add Bino boolean keyword and plot Binospec FoV when set
      - Change out_pdf suffix for Bino and Hecto case
+     - List comprehensions for mask/config centers
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -364,15 +365,13 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                      ((ptg_tab['Instr'][xx] == 'DEIMOS') and
                       (ptg_tab['Field'][xx] == t_field))]
             if len(d_idx) > 0:
-                pa, a_coord = [], []
-                for cc in range(len(d_idx)):
-                    t_tab = ptg_tab[d_idx[cc]]
-                    a_coord.append([t_tab['RA'], t_tab['Dec']])
-                    pa.append(t_tab['PA'])
+                t_tab = ptg_tab[d_idx]
+                pa = t_tab['PA'].data
+                a_coord = [[ra,de] for ra,de in zip(t_tab['RA'], t_tab['Dec'])]
 
                 # Mod on 05/03/2018
                 maskno = [mname.replace(t_field+'-D','') for
-                          mname in ptg_tab['MaskName'][d_idx].data]
+                          mname in t_tab['MaskName']]
                 ax, deimos_verts0 = plot_deimos_fov(ax, a_coord, maskno, pa=pa)
 
                 # + on 04/03/2018
@@ -418,14 +417,12 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                      ((ptg_tab['Instr'][xx] == 'Hecto') and
                       (ptg_tab['Field'][xx] == t_field))]
             if len(h_idx) > 0:
-                a_coord = []
-                for cc in range(len(h_idx)):
-                    t_tab = ptg_tab[h_idx[cc]]
-                    a_coord.append([t_tab['RA'], t_tab['Dec']])
+                t_tab = ptg_tab[h_idx]
+                a_coord = [[ra,de] for ra,de in zip(t_tab['RA'], t_tab['Dec'])]
 
-                maskno = [mname.replace(t_field+'-H','') for
-                          mname in ptg_tab['MaskName'][h_idx].data]
-                ax = plot_hecto_fov(ax, a_coord, maskno)
+                configno = [cname.replace(t_field+'-H','') for
+                            cname in t_tab['MaskName'].data]
+                ax = plot_hecto_fov(ax, a_coord, configno)
 
                 hecto_fld_idx = in_hecto_field(tab0, a_coord, silent=silent,
                                                verbose=verbose)
@@ -467,14 +464,12 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                      ((ptg_tab['Instr'][xx] == 'Bino') and
                       (ptg_tab['Field'][xx] == t_field))]
             if len(b_idx) > 0:
-                pa = ptg_tab['PA'][b_idx].data
-                a_coord = []
-                for cc in range(len(b_idx)):
-                    t_tab = ptg_tab[b_idx[cc]]
-                    a_coord.append([t_tab['RA'], t_tab['Dec']])
+                t_tab = ptg_tab[b_idx]
+                pa = t_tab['PA'].data
+                a_coord = [[ra,de] for ra,de in zip(t_tab['RA'], t_tab['Dec'])]
 
                 maskno = [mname.replace(t_field+'-B','') for
-                          mname in ptg_tab['MaskName'][b_idx].data]
+                          mname in t_tab['MaskName'].data]
                 ax, deimos_verts0 = plot_bino_fov(ax, a_coord, maskno, pa=pa)
             #endif
         #endif
