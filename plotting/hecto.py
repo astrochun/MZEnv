@@ -3,6 +3,8 @@ import numpy as np
 from chun_codes import systime
 import matplotlib.patches as mpatches
 
+from astropy import log
+
 def in_hecto_field(tab0, fld_coord, silent=False, verbose=True):
     '''
     Determine sources in MMT/Hectospec field
