@@ -255,6 +255,7 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
      - Change out_pdf suffix for Bino and Hecto case
      - List comprehensions for mask/config centers
      - Call subsample_in_pointing for DEIMOS fields
+     - Call subsample_in_pointing for Hecto fields
     '''
 
     if silent == False: log.info('### Begin main : '+systime())
@@ -404,34 +405,10 @@ def main(field='', dr='pdr1', noOII=False, DEIMOS=False, Hecto=False,
                 hecto_fld_idx = in_hecto_field(tab0, a_coord, silent=silent,
                                                verbose=verbose)
 
-                # Get subsample sizes in each Hecto pointing
-                for key in sub_dict0.keys():
-                    s_idx = sub_dict0[key]
-
-                    cmd1 = 'n_fld_%s = np.zeros(len(h_idx), dtype=np.int)' % key
-                    exec(cmd1)
-                    for ff,in_field in zip(range(len(h_idx)),hecto_fld_idx):
-                        in_idx = list(set(in_field.tolist()) & set(s_idx))
-                        cmd2 = 'n_fld_%s[ff] = len(in_idx)' % key
-                        exec(cmd2)
-                    #endfor
-                #endfor
-                t_cols = ['n_fld_'+ aa for aa in sub_dict0.keys()]
-
-                ptg_tab_h = ptg_tab[h_idx]
-                fld_arr0 = [ptg_tab_h['MaskName'].data, ptg_tab_h['RA'].data,
-                            ptg_tab_h['Dec'].data]
-                names0 = ['MaskName', 'RA', 'Dec']
-
-                cmd3 = "fld_arr0 += ["+', '.join(t_cols)+']'
-                exec(cmd3)
-                names0 += [val.replace('NB0','NB') for val in sub_dict0.keys()]
-                hecto_tab0 = Table(fld_arr0, names=names0)
-
-                if silent == False: hecto_tab0.pprint(max_lines=-1)
-                tab_outfile = dir0+'catalogs/'+t_field+'_hecto.tex'
-                if silent == False: log.info('### Writing : '+tab_outfile)
-                hecto_tab0.write(tab_outfile, format='ascii.latex')
+                # Get subsample sizes in each Hecto pointing | Mod on 21/03/2018
+                hecto_outfile = dir0+'catalogs/'+t_field+'_hecto.tex'
+                ss_in_ptg(sub_dict0, hecto_fld_idx, t_tab, 'Hecto',
+                          hecto_outfile, silent=silent, verbose=verbose)
             #endif
         #endif
 
