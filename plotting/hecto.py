@@ -79,6 +79,8 @@ def plot_hecto_fov(ax, coord, configno):
     Modified by Chun Ly, 16 March 2018
      - Loop over each input coordinate set and add Circle patch for each
        Hecto pointing
+    Modified by Chun Ly, 27 March 2018
+     - Label Hecto pointings with configno
     '''
 
     radius = 0.5 # in deg
@@ -89,5 +91,8 @@ def plot_hecto_fov(ax, coord, configno):
         circ = mpatches.Circle(coord[cc], radius=radius, alpha=0.5, ec="b",
                                color="none", linewidth=1.5)
         ax.add_patch(circ)
+        ax.text(coord[cc][0], coord[cc][1]-0.475, configno[cc], ha='center',
+                va='center', rotation=0.0, color='blue')
+
     return ax
 #enddef
